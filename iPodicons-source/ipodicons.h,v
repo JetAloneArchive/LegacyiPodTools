@@ -1,0 +1,261 @@
+head	1.4;
+access;
+symbols
+	ipodicons-0_3_6:1.4
+	ipodicons-0_3_5:1.4
+	ipodicons-0_3_4:1.4
+	qt4_port:1.3.0.2
+	ipodicons-0_3_3:1.2
+	ipodicons-0_3_2:1.2
+	ipodicons-0_3_1:1.2
+	ipodicons-0_3_0:1.1;
+locks; strict;
+comment	@ * @;
+
+
+1.4
+date	2005.09.14.02.35.46;	author a1291762;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.07.08.14.19.05;	author a1291762;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.03.13.02.06.47;	author link;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.02.05.54;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.4
+log
+@Throw away the Qt 4 work (the qt4_port branch can be used to continue it).
+Trying to manually sync to pre-qt4 state (might not be there).
+Build with Qt 3.3.5.
+@
+text
+@/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+#ifndef IPODICONS_H
+#define IPODICONS_H
+
+#include <qobject.h>
+#include <qstringlist.h>
+#include <qsettings.h>
+#include <qpixmap.h>
+
+class QProcess;
+class QWidget;
+class QHttp;
+class Settings;
+class IconBrowser;
+class PrefsDialog;
+class WaitDialog;
+
+#define IPOD_DIR "ipod"
+#define IPOD_RAW_DIR "ipod.raw"
+#define IPOD_FW "ipod-fw"
+
+class IpodIcons : public QObject
+{
+    friend int main(int,char*[]);
+    friend class PrefsDialog;
+
+    Q_OBJECT
+
+    IpodIcons( QObject *parent = 0 );
+    virtual ~IpodIcons();
+
+public:
+    static IpodIcons *getInstance( QWidget *parent = 0 );
+    static QString dataDir();
+    static QString pathPrefix();
+
+    void startProc( const QString &message, const QStringList &args,
+	            QObject *receiver, const char *slot,
+		    QObject *receiver2 = 0, const char *slot2 = 0,
+		    bool cancel = false, bool fake = false );
+    void cleanupTempFiles();
+    void removeDir( const QString &dir );
+    void copyFile( const QString &source, const QString &dest );
+    void registerBrowser( IconBrowser *ib );
+    void deregisterBrowser( IconBrowser *ib );
+    void about();
+    QString getText( const QString &filename );
+    void setText( const QString &filename, const QString &text );
+
+    // session accessors
+    int recentFiles() { return session.recentFiles; }
+
+signals:
+    void dataReceived( QProcess *proc );
+
+private slots:
+    void slotIpodeditData();
+    void slotIpodeditDone();
+    void slotIpodeditCanceled();
+
+    void httpDone( int id, bool error );
+
+    void shutdown();
+
+private:
+    void loadSession();
+    void saveSession();
+
+    QProcess *ipodeditProc;
+    QObject *dataReceiver;
+    const char *dataSlot;
+    WaitDialog *mProgressDialog;
+    QWidget *parentWidget;
+    QHttp *http;
+    QString mPathPrefix;
+    QString mDataDir;
+    QValueList<IconBrowser*> browsers;
+    QPixmap mIcon;
+
+    struct Session
+    {
+        QString version;
+        int nextCheck;
+	int recentFiles;
+    };
+    Session session;
+};
+
+class Settings : public QSettings
+{
+public:
+    Settings( const char *prefix = 0 );
+    ~Settings();
+};
+
+class Version
+{
+public:
+    Version( const QString &version );
+    ~Version();
+
+    bool operator<=( const Version &other );
+    bool operator<( const Version &other );
+
+private:
+    int major;
+    int minor;
+    int release;
+};
+
+// This is similar to the qDeleteAll() function that is in Qt 4.
+// It's for deleting all the items in a QList (QValueList) and is
+// designed to help replace QPtrList::setAutoDelete().
+template<typename T>
+void qDeleteAll( QValueList<T*> &list )
+{
+    QValueList<T*> l2 = list;
+    for ( typename QValueList<T*>::const_iterator it = l2.begin(); it != l2.end(); it++ ) {
+	delete (*it);
+    }
+    list.clear();
+}
+
+#endif
+@
+
+
+1.3
+log
+@Quick Qt 4 port.
+This just gets everything to compile.
+I need to steal my "how to process Qt 4 libs" code to make the .app usable.
+@
+text
+@d26 1
+a26 1
+class Q3Process;
+d70 1
+a70 1
+    void dataReceived( Q3Process *proc );
+d85 1
+a85 1
+    Q3Process *ipodeditProc;
+d93 1
+a93 1
+    QList<IconBrowser*> browsers;
+d128 1
+a128 1
+// It's for deleting all the items in a QList (QList) and is
+d131 1
+a131 1
+void qDeleteAll( QList<T*> &list )
+d133 2
+a134 2
+    QList<T*> l2 = list;
+    for ( typename QList<T*>::const_iterator it = l2.begin(); it != l2.end(); it++ ) {
+@
+
+
+1.2
+log
+@ipodicons 0.3.1
+@
+text
+@d26 1
+a26 1
+class QProcess;
+d70 1
+a70 1
+    void dataReceived( QProcess *proc );
+d85 1
+a85 1
+    QProcess *ipodeditProc;
+d93 1
+a93 1
+    QValueList<IconBrowser*> browsers;
+d128 1
+a128 1
+// It's for deleting all the items in a QList (QValueList) and is
+d131 1
+a131 1
+void qDeleteAll( QValueList<T*> &list )
+d133 2
+a134 2
+    QValueList<T*> l2 = list;
+    for ( typename QValueList<T*>::const_iterator it = l2.begin(); it != l2.end(); it++ ) {
+@
+
+
+1.1
+log
+@ipodicons 0.3.0
+@
+text
+@d63 2
+d126 13
+@
+

@@ -1,0 +1,381 @@
+head	1.3;
+access;
+symbols
+	ipodicons-0_3_6:1.3
+	ipodicons-0_3_5:1.3
+	ipodicons-0_3_4:1.3
+	qt4_port:1.2.0.2
+	ipodicons-0_3_3:1.1
+	ipodicons-0_3_2:1.1
+	ipodicons-0_3_1:1.1
+	ipodicons-0_3_0:1.1;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2005.09.14.02.35.46;	author a1291762;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.07.08.14.19.05;	author a1291762;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.02.05.54;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@Throw away the Qt 4 work (the qt4_port branch can be used to continue it).
+Trying to manually sync to pre-qt4 state (might not be there).
+Build with Qt 3.3.5.
+@
+text
+@<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>WaitDialogBase</class>
+<comment>
+/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+</comment>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>WaitDialogBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>200</width>
+            <height>86</height>
+        </rect>
+    </property>
+    <property name="minimumSize">
+        <size>
+            <width>200</width>
+            <height>0</height>
+        </size>
+    </property>
+    <property name="caption">
+        <string></string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>lblMessage</cstring>
+            </property>
+            <property name="text">
+                <string>message</string>
+            </property>
+            <property name="alignment">
+                <set>AlignCenter</set>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout21</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer6</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>151</width>
+                            <height>31</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>btnAbort</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Abort</string>
+                    </property>
+                    <property name="default">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer5</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>151</width>
+                            <height>41</height>
+                        </size>
+                    </property>
+                </spacer>
+            </hbox>
+        </widget>
+    </vbox>
+</widget>
+<layoutdefaults spacing="6" margin="6"/>
+</UI>
+@
+
+
+1.2
+log
+@Quick Qt 4 port.
+This just gets everything to compile.
+I need to steal my "how to process Qt 4 libs" code to make the .app usable.
+@
+text
+@d1 4
+a4 3
+<ui version="4.0" stdsetdef="1" >
+  <author></author>
+  <comment>
+d20 1
+d22 3
+a24 10
+  <exportmacro></exportmacro>
+  <class>WaitDialogBase</class>
+  <widget class="QDialog" name="WaitDialogBase" >
+    <property name="geometry" >
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>200</width>
+        <height>86</height>
+      </rect>
+d26 7
+a32 5
+    <property name="minimumSize" >
+      <size>
+        <width>200</width>
+        <height>0</height>
+      </size>
+d34 5
+a38 2
+    <property name="windowTitle" >
+      <string/>
+d40 72
+a111 9
+    <layout class="QVBoxLayout" >
+      <item>
+        <widget class="QLabel" name="lblMessage" >
+          <property name="text" >
+            <string>message</string>
+          </property>
+          <property name="alignment" >
+            <set>Qt::AlignCenter</set>
+          </property>
+d113 4
+a116 52
+      </item>
+      <item>
+        <layout class="QHBoxLayout" >
+          <item>
+            <spacer name="spacer6" >
+              <property name="sizeHint" >
+                <size>
+                  <width>151</width>
+                  <height>31</height>
+                </size>
+              </property>
+              <property name="sizeType" >
+                <enum>Expanding</enum>
+              </property>
+              <property name="orientation" >
+                <enum>Horizontal</enum>
+              </property>
+            </spacer>
+          </item>
+          <item>
+            <widget class="QPushButton" name="btnAbort" >
+              <property name="text" >
+                <string>Abort</string>
+              </property>
+              <property name="default" >
+                <bool>true</bool>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <spacer name="spacer5" >
+              <property name="sizeHint" >
+                <size>
+                  <width>151</width>
+                  <height>41</height>
+                </size>
+              </property>
+              <property name="sizeType" >
+                <enum>Expanding</enum>
+              </property>
+              <property name="orientation" >
+                <enum>Horizontal</enum>
+              </property>
+            </spacer>
+          </item>
+        </layout>
+      </item>
+    </layout>
+  </widget>
+  <layoutdefault spacing="6" margin="6" />
+  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+</ui>
+@
+
+
+1.1
+log
+@ipodicons 0.3.0
+@
+text
+@d1 3
+a3 4
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>WaitDialogBase</class>
+<comment>
+/*
+a18 1
+ */
+d20 10
+a29 3
+<widget class="QDialog">
+    <property name="name">
+        <cstring>WaitDialogBase</cstring>
+d31 5
+a35 7
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>200</width>
+            <height>86</height>
+        </rect>
+d37 2
+a38 5
+    <property name="minimumSize">
+        <size>
+            <width>200</width>
+            <height>0</height>
+        </size>
+d40 9
+a48 72
+    <property name="caption">
+        <string></string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>lblMessage</cstring>
+            </property>
+            <property name="text">
+                <string>message</string>
+            </property>
+            <property name="alignment">
+                <set>AlignCenter</set>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout21</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer6</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>151</width>
+                            <height>31</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>btnAbort</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Abort</string>
+                    </property>
+                    <property name="default">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer5</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>151</width>
+                            <height>41</height>
+                        </size>
+                    </property>
+                </spacer>
+            </hbox>
+d50 52
+a101 4
+    </vbox>
+</widget>
+<layoutdefaults spacing="6" margin="6"/>
+</UI>
+@
+

@@ -1,0 +1,2346 @@
+head	1.15;
+access;
+symbols
+	ipodicons-0_3_6:1.14
+	ipodicons-0_3_5:1.14
+	ipodicons-0_3_4:1.14
+	qt4_port:1.13.0.2
+	ipodicons-0_3_3:1.11
+	ipodicons-0_3_2:1.11
+	ipodicons-0_3_1:1.10
+	ipodicons-0_3_0:1.9
+	ipodicons-0_2_4:1.8
+	ipodicons-0_2_3:1.7
+	ipodicons-0_2_2:1.6
+	ipodicons-0_2_1:1.5
+	ipodicons-0_2_0:1.4
+	ipodicons-0_1_3:1.3
+	ipodicons-0_1_2:1.2
+	ipodicons-0_1_1:1.1.1.1
+	release:1.1.1.1
+	vendor:1.1.1;
+locks; strict;
+comment	@// @;
+
+
+1.15
+date	2006.05.02.14.45.00;	author a1291762;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	2005.09.14.02.35.46;	author a1291762;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2005.07.12.14.05.45;	author a1291762;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	2005.07.08.14.19.05;	author a1291762;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2005.03.13.02.07.22;	author link;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2005.03.13.02.06.47;	author link;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2005.03.13.02.05.54;	author link;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2005.03.13.02.03.39;	author link;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2005.03.13.02.02.39;	author link;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2005.03.13.02.01.53;	author link;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2005.03.13.02.00.55;	author link;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2005.03.13.02.00.01;	author link;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.03.13.01.58.57;	author link;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.03.13.01.50.30;	author link;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.01.47.44;	author link;	state Exp;
+branches
+	1.1.1.1;
+next	;
+
+1.1.1.1
+date	2005.03.13.01.47.44;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.15
+log
+@fix a hang when using popup menu
+@
+text
+@/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+#include "iconbrowser.h"
+#include "trace.h"
+#include "firmwareselector.h"
+#include "ipodicons.h"
+#ifdef DATA_FILE
+#include "datafile.h"
+#endif
+#include "prefsdialog.h"
+
+#include <qprocess.h>
+#include <qfiledialog.h>
+#include <qapplication.h>
+#include <qmessagebox.h>
+#include <qiconview.h>
+#include <qstringlist.h>
+#include <qtimer.h>
+#include <qstatusbar.h>
+#include <qpopupmenu.h>
+#include <qaction.h>
+#include <qpainter.h>
+#include <qlineedit.h>
+#include <qbuttongroup.h>
+#include <qbutton.h>
+
+class IpodViewItem : public QObject, public QIconViewItem
+{
+    Q_OBJECT
+public:
+    IpodViewItem( IconBrowser::ItemType type, const QString &filename, QIconView *parent, IconBrowser *_ib );
+    virtual ~IpodViewItem();
+
+    IconBrowser::ItemType type();
+    QString filename();
+
+    void refresh();
+    void setText( const QString &text );
+
+public slots:
+    void slotImportThread();
+    void slotImport();
+    void slotExportThread();
+    void slotExport();
+    void slotImportDone();
+
+private:
+    IconBrowser *ib;
+    IconBrowser::ItemType mType;
+    QString mFilename;
+};
+
+IpodViewItem::IpodViewItem( IconBrowser::ItemType type, const QString &filename, QIconView *parent, IconBrowser *_ib )
+    : QObject( parent ), QIconViewItem( parent ),
+    ib( _ib ),
+    mType( type ),
+    mFilename( filename )
+{
+    switch ( mType ) {
+	case IconBrowser::Text:
+	    {
+		setKey( mFilename );
+		QString contents = IpodIcons::getInstance()->getText( QString("%1/%2").arg(IPOD_DIR).arg(mFilename) );
+		QIconViewItem::setText( contents );
+		setPixmap( QPixmap() );
+		//qDebug( "from %s, got '%s'", text.local8Bit().data(), contents.local8Bit().data() );
+		setRenameEnabled( true );
+	    }
+	    break;
+	case IconBrowser::Icon:
+	    setText( "" );
+	    refresh();
+	    break;
+    }
+}
+
+IpodViewItem::~IpodViewItem()
+{
+}
+
+IconBrowser::ItemType IpodViewItem::type()
+{
+    return mType;
+}
+
+QString IpodViewItem::filename()
+{
+    return mFilename;
+}
+
+void IpodViewItem::refresh()
+{
+    //TRACE("IpodViewItem::refresh()");
+    switch ( mType ) {
+	case IconBrowser::Icon:
+	    {
+                int thumb = ib->session.thumbSize;
+                QImage i( QString("%1/%2").arg(IPOD_DIR).arg(mFilename) );
+		if ( ib->session.thumbnails )
+		    i = i.scale( thumb, thumb, QImage::ScaleMin );
+                QPixmap pix( (int)(i.width() + 0.3 * thumb), (int)(i.height() + 0.3 * thumb) );
+                if ( pix.isNull() ) {
+                    qWarning( "Could not create pixmap" );
+                    setPixmap( QPixmap() );
+                    break;
+                }
+                QPainter p( &pix );
+                p.setPen( Qt::black );
+                p.setBrush( Qt::white );
+                p.drawRect( 0, 0, pix.width(), pix.height() );
+                int x = (int)((pix.width() - i.width()) / 2.0);
+                int y = (int)((pix.height() - i.height()) / 2.0);
+                p.drawImage( QPoint(x, y), i );
+                p.flush();
+                setPixmap( pix );
+	    }
+	    break;
+	default:
+	    break;
+    }
+}
+
+void IpodViewItem::setText( const QString &text )
+{
+    //TRACE("IpodViewItem::setText(%s)", text.local8Bit().data());
+    if ( mType != IconBrowser::Text || text.length() == QIconViewItem::text().length() ) {
+	if ( text != QIconViewItem::text() ) {
+	    QIconViewItem::setText( text );
+	    if ( mType == IconBrowser::Text ) {
+		IpodIcons::getInstance()->setText( QString("%1/%2").arg(IPOD_DIR).arg(mFilename), text );
+		QStringList args;
+		args << IpodIcons::pathPrefix() + "/ipodedit" << "p" << QString("%1/%2").arg(IPOD_DIR).arg(mFilename);
+		ib->importFile = QFileInfo(mFilename).baseName() + ".rsrc";
+		IpodIcons::getInstance(ib)->startProc( tr("Preparing Resource"), args, this, SLOT(slotImportDone()) );
+	    }
+	}
+    }
+}
+
+void IpodViewItem::slotImport()
+{
+    QTimer::singleShot( 0, this, SLOT(slotImportThread()) );
+}
+
+void IpodViewItem::slotImportThread()
+{
+    ib->importItem( this );
+}
+
+void IpodViewItem::slotExport()
+{
+    QTimer::singleShot( 0, this, SLOT(slotExportThread()) );
+}
+
+void IpodViewItem::slotExportThread()
+{
+    ib->exportItem( this );
+}
+
+void IpodViewItem::slotImportDone()
+{
+    TRACE("IpodViewItem::slotImportDone()");
+    IpodIcons::getInstance()->copyFile(
+	    QString("%1/%2/%3").arg(IpodIcons::dataDir()).arg(IPOD_DIR).arg(ib->importFile),
+	    QString("%1/%2/%3").arg(IpodIcons::dataDir()).arg(IPOD_RAW_DIR).arg(ib->importFile) );
+}
+
+// ====================================================================
+
+IconBrowser::IconBrowser( QWidget *parent, const char *name, WFlags f)
+    : IconBrowserBase( parent, name, f ),
+    firmwareSelector( 0 )
+{
+    TRACE("IconBrowser::IconBrowser()");
+
+    IpodIcons::getInstance()->registerBrowser( this );
+
+    loadSession();
+
+    updateText();
+
+    firmwareCombo->setButton( session.resourceIndex );
+
+    refreshDisplay();
+}
+
+IconBrowser::~IconBrowser()
+{
+    TRACE("IconBrowser::~IconBrowser()");
+    saveSession();
+    qDeleteAll(mLoadedIcons);
+    IpodIcons::getInstance()->deregisterBrowser( this );
+}
+
+void IconBrowser::slotFirmwareCombo( int index )
+{
+    TRACE("IconBrowser::slotFirmwareCombo()");
+    qDebug( "session %d", session.resourceIndex );
+    if ( session.resourceIndex != index ) {
+	session.resourceIndex = index;
+	refreshDisplay();
+    }
+}
+
+void IconBrowser::slotIconMenu( QIconViewItem *_itm, const QPoint &p )
+{
+    TRACE("IconBrowser::slotIconMenu()");
+
+    IpodViewItem *itm = dynamic_cast<IpodViewItem*>(_itm);
+    // Might not have clicked in a valid spot
+    //Q_ASSERT( itm );
+    if ( !itm || itm->type() != IconBrowser::Icon )
+	return;
+
+    QPopupMenu pop( mIcons );
+    pop.insertItem( tr("&Import Icon"), itm, SLOT(slotImport()), 0 );
+    pop.insertItem( tr("&Export Icon"), itm, SLOT(slotExport()), 0 );
+    pop.exec(mIcons->mapTo( mIcons, p ));
+}
+
+void IconBrowser::importItem( IpodViewItem *itm )
+{
+    TRACE("IconBrowser::importItem(%s)", itm->filename().local8Bit().data());
+
+    // Pick a file
+    QString s = QFileDialog::getOpenFileName( session.startingDir[Session::LoadPng], "All Files (*)", this, 0, tr("Import Icon") );
+    qDebug( "selected %s", s.local8Bit().data() );
+    if ( s.isEmpty() )
+	return;
+
+    session.startingDir[Session::LoadPng] = QFileInfo(s).dirPath(true);
+
+    QPixmap p( s );
+    if ( p.isNull() ) {
+        QMessageBox::warning( this, tr("Error"), tr("<qt>Could not read %1").arg(s), QMessageBox::Ok, 0, 0 );
+	return;
+    }
+    QString outFile = QString("%1/%2/%3").arg(IpodIcons::dataDir()).arg(IPOD_DIR).arg(itm->filename());
+    qDebug( "outfile %s", outFile.local8Bit().data() );
+    int depth = extractDepth( itm->filename() );
+    QPixmap real( outFile );
+    p.resize( real.width(), real.height() );
+    p.save( outFile, QImage::imageFormat( outFile ) );
+    itm->refresh();
+
+    QStringList args;
+    args << IpodIcons::pathPrefix() + "/ipodedit" << "p" << QString("%1/%2").arg(IPOD_DIR).arg(itm->filename());
+    if ( depth )
+	args << QString("%1").arg(depth);
+    importFile = QFileInfo(itm->filename()).baseName() + ".rsrc";
+    IpodIcons::getInstance(this)->startProc( tr("Preparing Resource"), args, this, SLOT(slotImportItemDone()) );
+}
+
+void IconBrowser::slotImportItemDone()
+{
+    TRACE("IconBrowser::slotImportItemDone()");
+    IpodIcons::getInstance()->copyFile(
+	    QString("%1/%2/%3").arg(IpodIcons::dataDir()).arg(IPOD_DIR).arg(importFile),
+	    QString("%1/%2/%3").arg(IpodIcons::dataDir()).arg(IPOD_RAW_DIR).arg(importFile) );
+    QDir d( IpodIcons::dataDir() + "/" IPOD_DIR );
+    d.remove( importFile );
+}
+
+void IconBrowser::exportItem( IpodViewItem *itm )
+{
+    TRACE("IconBrowser::exportItem(%s)", itm->filename().local8Bit().data());
+    qDebug( "Saving %s", itm->filename().local8Bit().data() );
+
+    // Pick a file
+    QString s = QFileDialog::getSaveFileName( session.startingDir[Session::SavePng], "All Files (*)", this, 0, tr("Export Icon") );
+    qDebug( "selected %s", s.local8Bit().data() );
+    if ( s.isEmpty() )
+	return;
+
+    session.startingDir[Session::SavePng] = QFileInfo(s).dirPath(true);
+
+    if ( QFileInfo(s).extension(false).lower() != session.outFormat.lower() )
+	s.append( QString(".%1").arg(session.outFormat.lower()) );
+
+    QPixmap p( QString("%1/%2/%3").arg(IpodIcons::dataDir() ).arg(IPOD_DIR).arg(itm->filename()) );
+    Q_ASSERT( !p.isNull() );
+    bool ok = p.save( s, session.outFormat );
+    Q_ASSERT( ok );
+}
+
+void IconBrowser::refreshDisplay()
+{
+    TRACE("IconBrowser::refreshDisplay()");
+
+    mIcons->clear();
+    mLoadedIcons.clear();
+    mHiddenIcons = false;
+
+    QDir ipodPics( QString("%1/%2").arg(IpodIcons::dataDir()).arg(IPOD_DIR) );
+    if ( !ipodPics.exists() )
+        return;
+
+    QStringList files = ipodPics.entryList();
+    for ( QStringList::Iterator it = files.begin(); it != files.end(); it++ ) {
+	const QString entry( *it );
+	if ( entry == "." || entry == ".." )
+	    continue;
+	bool needContinue = false;
+	switch ( firmwareCombo->selectedId() ) {
+	    case IconBrowser::Icon:
+		if ( !entry.contains(".pgm") && !entry.contains(".ppm") )
+		    needContinue = true;
+		break;
+	    case IconBrowser::Text:
+		if ( !entry.contains(".txt") )
+		    needContinue = true;
+		break;
+	    default:
+		break;
+	}
+	if ( needContinue )
+	    continue;
+	IpodViewItem *item = new IpodViewItem( (IconBrowser::ItemType)firmwareCombo->selectedId(), entry, mIcons, this );
+	mLoadedIcons << item;
+    }
+
+    mIcons->sort();
+    QTimer::singleShot( 0, this, SLOT(slotSearch()) );
+}
+
+void IconBrowser::slotNewCurrentItem( QIconViewItem *item )
+{
+    TRACE("IconBrowser::slotNewCurrentItem()");
+    if ( item != 0 ) {
+	IpodViewItem *itm = dynamic_cast<IpodViewItem*>(item);
+	Q_ASSERT( itm );
+	if ( !itm )
+	    return;
+	statusBar()->message( itm->filename() );
+    } else {
+	statusBar()->clear();
+    }
+
+    if ( firmwareCombo->selectedId() != IconBrowser::Icon || item == 0 ) {
+	actionEditImportItem->setEnabled( false );
+	actionEditExportItem->setEnabled( false );
+    } else {
+	actionEditImportItem->setEnabled( true );
+	actionEditExportItem->setEnabled( true );
+    }
+}
+
+bool IconBrowser::checkSave()
+{
+    TRACE("IconBrowser::checkSave()");
+    return true;
+}
+
+void IconBrowser::slotFileOpen()
+{
+#ifdef DATA_FILE
+    TRACE("IconBrowser::slotFileOpen()");
+    
+    if ( !checkSave() )
+	return;
+
+    IpodIcons::getInstance()->cleanupTempFiles();
+
+    // Pick a file
+    QString s = QFileDialog::getOpenFileName( session.startingDir[Session::Open], tr("Zip Files (*.zip)"), this, 0, tr("Open") );
+    qDebug( "selected %s", s.local8Bit().data() );
+    if ( s.isEmpty() )
+	return;
+
+    session.startingDir[Session::Open] = QFileInfo(s).dirPath(true);
+
+    DataFile *df = new DataFile();
+    if ( !df->load( s ) ) {
+	//TODO QMessageBox::warning();
+	return;
+    }
+
+    session.recentFiles << s;
+    session.currentFile = df;
+    updateText();
+
+    refreshDisplay();
+#endif
+}
+
+void IconBrowser::slotFileClose()
+{
+    TRACE("IconBrowser::slotFileClose()");
+
+    if ( !checkSave() )
+	return;
+
+#ifdef DATA_FILE
+    delete session.currentFile;
+    session.currentFile = 0;
+#else
+    session.currentFile = "";
+#endif
+    updateText();
+
+    IpodIcons::getInstance()->cleanupTempFiles();
+
+    refreshDisplay();
+}
+
+void IconBrowser::slotFileSave()
+{
+#ifdef DATA_FILE
+    TRACE("IconBrowser::slotFileSave()");
+    if ( session.currentFile->filename().isEmpty() ) {
+	slotFileSaveAs();
+	return;
+    }
+#endif
+}
+
+void IconBrowser::slotFileSaveAs()
+{
+#ifdef DATA_FILE
+    TRACE("IconBrowser::slotFileSaveAs()");
+    QString s = QFileDialog::getSaveFileName( session.startingDir[Session::Save], tr("Zip Files (*.zip)"), this, 0, tr("Export Firmware") );
+    qDebug( "selected %s", s.local8Bit().data() );
+    if ( s.isEmpty() )
+	return;
+
+    session.startingDir[Session::Save] = QFileInfo(s).dirPath(true);
+
+    if ( (int)s.find(".zip") != (int)(s.length() - 4) ) {
+	s.append(".zip");
+	qDebug( "changed to %s", s.local8Bit().data() );
+    }
+#endif
+}
+
+void IconBrowser::slotFileImport()
+{
+    TRACE("IconBrowser::slotFileImport()");
+    if ( firmwareSelector ) {
+	qWarning( "firmwareSelector exists" );
+	return;
+    }
+
+    firmwareSelector = new FirmwareSelector( FirmwareSelector::Import, this, 0, true );
+    if ( !firmwareSelector->exec() ) {
+	delete firmwareSelector;
+	firmwareSelector = 0;
+	return;
+    }
+
+    mIcons->clear();
+
+    IpodIcons::getInstance()->cleanupTempFiles();
+
+    IpodIcons::getInstance()->copyFile( IpodIcons::dataDir() + "/firmware-fs", IpodIcons::dataDir() + "/firmware" );
+    QStringList args;
+    args << IpodIcons::pathPrefix() + "/ipodedit" << "x" << IpodIcons::dataDir() + "/firmware";
+    IpodIcons::getInstance(this)->startProc( tr("Importing Resources"), args,
+	    this, SLOT(slotFileImportDone()), 0, 0, true );
+}
+
+void IconBrowser::slotFileExport()
+{
+    TRACE("IconBrowser::slotFileExport");
+    if ( firmwareSelector ) {
+	qWarning( "firmwareSelector exists" );
+	return;
+    }
+
+    firmwareSelector = new FirmwareSelector( FirmwareSelector::Export, this, 0, true );
+    if ( !firmwareSelector->exec() ) {
+	delete firmwareSelector;
+	firmwareSelector = 0;
+	return;
+    }
+
+    QStringList args;
+    args << IpodIcons::pathPrefix() + "/ipodedit" << "w" << IpodIcons::dataDir() + "/firmware" << IPOD_RAW_DIR;
+    IpodIcons::getInstance(this)->startProc( tr("Exporting Resources"), args, this, SLOT(slotExportDone()) );
+}
+
+void IconBrowser::slotExportDone()
+{
+    TRACE("IconBrowser::slotExportDone()");
+    connect( firmwareSelector, SIGNAL(restoreDone()), this, SLOT(slotRestoreDone()) );
+    QTimer::singleShot( 0, firmwareSelector, SLOT(restoreFirmware()) );
+}
+
+void IconBrowser::slotRestoreDone()
+{
+    TRACE("IconBrowser::slotRestoreDone()");
+    firmwareSelector->deleteLater();
+    firmwareSelector = 0;
+}
+
+void IconBrowser::slotFileQuit()
+{
+    TRACE("IconBrowser::slotFileQuit()");
+    checkSave();
+    close();
+}
+
+void IconBrowser::slotEditImportItem()
+{
+    TRACE("IconBrowser::slotEditImportItem()");
+    IpodViewItem *itm = dynamic_cast<IpodViewItem*>(mIcons->currentItem());
+    Q_ASSERT( itm );
+    if ( !itm )
+	return;
+    importItem( itm );
+}
+
+void IconBrowser::slotEditExportItem()
+{
+    TRACE("IconBrowser::slotEditExportItem()");
+    IpodViewItem *itm = dynamic_cast<IpodViewItem*>(mIcons->currentItem());
+    Q_ASSERT( itm );
+    if ( !itm )
+	return;
+    exportItem( itm );
+}
+
+void IconBrowser::slotEditPreferences()
+{
+    TRACE("IconBrowser::slotEditPreferences()");
+    bool thumbnails = session.thumbnails;
+    int thumbSize = session.thumbSize;
+    PrefsDialog dlg( this, 0, TRUE );
+    dlg.exec();
+    if ( thumbnails != session.thumbnails || (thumbnails && thumbSize != session.thumbSize) )
+	refreshDisplay();
+}
+
+void IconBrowser::slotHelpAbout()
+{
+    TRACE("IconBrowser::slotHelpAbout()");
+    IpodIcons::getInstance(this)->about();
+}
+
+void IconBrowser::slotHelpAboutQt()
+{
+    TRACE("IconBrowser::slotHelpAboutQt()");
+    QMessageBox::aboutQt( this, tr("About Qt") );
+}
+
+void IconBrowser::saveSession()
+{
+    TRACE("IconBrowser::saveSession()");
+    Settings settings("iconbrowser");
+    QStringList list = settings.entryList( "" );
+    for ( QStringList::const_iterator it = list.begin(); it != list.end(); it++ ) {
+	QString entry = *it;
+	if ( entry.find("recentFile") == 0 )
+	    settings.removeEntry( entry );
+    }
+    int first = 0;
+    int recentFiles = IpodIcons::getInstance()->recentFiles();
+    if ( (int)session.recentFiles.count() > recentFiles )
+	first = session.recentFiles.count() - recentFiles;
+    for ( int i = first; i < (int)session.recentFiles.count(); i++ ) {
+	settings.writeEntry( QString("recentFile%1").arg(i), session.recentFiles[i] );
+    }
+    for ( int i = 0; i < Session::MaxStartingDirType; i++ ) {
+	settings.writeEntry( QString("startingDir%1").arg(i), session.startingDir[i] );
+    }
+    settings.writeEntry( "resourceIndex", session.resourceIndex );
+    settings.writeEntry( "thumbSize", session.thumbSize );
+    settings.writeEntry( "thumbnails", session.thumbnails );
+    settings.writeEntry( "outFormat", session.outFormat );
+    settings.writeEntry( "currentFile", session.currentFile );
+}
+
+void IconBrowser::loadSession()
+{
+    TRACE("IconBrowser::loadSession()");
+    Settings settings("iconbrowser");
+    session.recentFiles.clear();
+    int recentFiles = IpodIcons::getInstance()->recentFiles();
+    for ( int i = 0; i < recentFiles; i++ ) {
+	session.recentFiles.append( settings.readEntry( QString("recentFile%1").arg(i) ) );
+    }
+    for ( int i = 0; i < Session::MaxStartingDirType; i++ ) {
+	session.startingDir[i] = settings.readEntry( QString("startingDir%1").arg( i ), getenv("HOME") );
+    }
+    session.resourceIndex = settings.readNumEntry( "resourceIndex" );
+    session.thumbSize = settings.readNumEntry( "thumbSize", 32 );
+    session.thumbnails = settings.readBoolEntry( "thumbnails", false );
+    session.outFormat = settings.readEntry( "outFormat", "JPEG" );
+    session.currentFile = settings.readEntry( "currentFile", "" );
+}
+
+void IconBrowser::updateText()
+{
+    TRACE("IconBrowser::ipdateText()");
+#ifdef DATA_FILE
+    if ( session.currentFile == 0 )
+	setCaption( tr("iPodIcons") );
+    else
+	setCaption( tr("iPodIcons - %1").arg(session.currentFile->filename()) );
+#else
+    if ( session.currentFile.isEmpty() )
+	setCaption( tr("iPodIcons") );
+    else
+	setCaption( tr("iPodIcons - %1").arg(session.currentFile) );
+#endif
+}
+
+void IconBrowser::slotFileImportDone()
+{
+    TRACE("IconBrowser::slotFileImportDone()");
+    session.currentFile = firmwareSelector->selectedFirmware();
+    updateText();
+    firmwareSelector->deleteLater();
+    firmwareSelector = 0;
+    QString rawDir = IpodIcons::dataDir() + "/" IPOD_RAW_DIR;
+    IpodIcons::getInstance()->removeDir( rawDir );
+    QDir().mkdir( rawDir );
+    refreshDisplay();
+}
+
+int IconBrowser::extractDepth( const QString &file )
+{
+    TRACE("IconBrowser::extractDepth(%s)", file.local8Bit().data());
+    QString resource = QFileInfo(file).baseName();
+    QFile f( IpodIcons::dataDir() + "/ipod-resources.txt" );
+    bool ok = f.open( IO_ReadOnly );
+    Q_ASSERT( ok );
+    QTextStream ts( &f );
+    QString line;
+    while ( !f.atEnd() ) {
+	line = ts.readLine();
+	if ( line.find(resource) == 0 && line.at(resource.length()) == ':' ) {
+	    int depth = line.mid( line.find("depth=") + 6 ).toInt();
+	    if ( depth < 8 )
+		return depth;
+	    return 0;
+	}
+    }
+    return 0;
+}
+
+void IconBrowser::slotSearch()
+{
+    TRACE("IconBrowser::slotSearch()");
+    QString search = leSearch->text().lower();
+    if ( firmwareCombo->selectedId() != IconBrowser::Text ||
+	 (mHiddenIcons && search == prevSearch) )
+	return;
+    prevSearch = search;
+
+    QIconViewItem *citem = mIcons->currentItem();
+    if ( mHiddenIcons ) {
+	mHiddenIcons = false;
+	// take out the rest of the items
+	for ( QIconViewItem *itm = mIcons->firstItem(); itm; itm = itm->nextItem() )
+	    mIcons->takeItem( itm );
+	// put all the items back in (this restores the original order)
+	for ( QValueList<IpodViewItem*>::const_iterator it = mLoadedIcons.begin(); it != mLoadedIcons.end(); it++ ) {
+	    IpodViewItem *itm = *it;
+	    mIcons->insertItem( itm );
+	}
+    }
+
+    if ( !search.isEmpty() ) {
+	for ( QValueList<IpodViewItem*>::const_iterator it = mLoadedIcons.begin(); it != mLoadedIcons.end(); it++ ) {
+	    QIconViewItem *itm = *it;
+	    if ( !itm->text().lower().contains(search) ) {
+		if ( itm == citem )
+		    citem = 0;
+		qDebug( "taking item %s", itm->text().local8Bit().data() );
+		(void)mIcons->takeItem( itm );
+		mHiddenIcons = true;
+	    }
+	}
+    }
+    mIcons->sort();
+    if ( citem )
+	mIcons->setCurrentItem( citem );
+}
+
+#include "iconbrowser.moc"
+@
+
+
+1.14
+log
+@Throw away the Qt 4 work (the qt4_port branch can be used to continue it).
+Trying to manually sync to pre-qt4 state (might not be there).
+Build with Qt 3.3.5.
+@
+text
+@d56 1
+d58 1
+d157 5
+d167 5
+@
+
+
+1.13
+log
+@use the Ui classes directly instead of via intermediate classes
+@
+text
+@d27 1
+a27 1
+#include <q3process.h>
+d31 1
+a31 1
+#include <q3iconview.h>
+d35 1
+a35 1
+#include <q3popupmenu.h>
+d40 1
+a40 2
+#include <qpushbutton.h>
+#include <QImageReader>
+d42 1
+a42 1
+class IpodViewItem : public QObject, public Q3IconViewItem
+d46 1
+a46 1
+    IpodViewItem( IconBrowser::ItemType type, const QString &filename, Q3IconView *parent, IconBrowser *_ib );
+d66 2
+a67 2
+IpodViewItem::IpodViewItem( IconBrowser::ItemType type, const QString &filename, Q3IconView *parent, IconBrowser *_ib )
+    : QObject( parent ), Q3IconViewItem( parent ),
+d77 1
+a77 1
+		Q3IconViewItem::setText( contents );
+d113 1
+a113 1
+		    i = i.scaled( thumb, thumb, Qt::KeepAspectRatio );
+d127 1
+a127 1
+                //p.flush();
+d139 3
+a141 3
+    if ( mType != IconBrowser::Text || text.length() == Q3IconViewItem::text().length() ) {
+	if ( text != Q3IconViewItem::text() ) {
+	    Q3IconViewItem::setText( text );
+d173 2
+a174 2
+IconBrowser::IconBrowser( QWidget *parent, const char *name, Qt::WFlags f)
+    : Q3MainWindow( parent, name, f ),
+a178 2
+    setupUi( this );
+
+d208 1
+a208 1
+void IconBrowser::slotIconMenu( Q3IconViewItem *_itm, const QPoint &p )
+d218 1
+a218 1
+    Q3PopupMenu pop( mIcons );
+d246 1
+a246 1
+    p.save( outFile, QImageReader::imageFormat( outFile ) );
+d329 1
+a329 1
+void IconBrowser::slotNewCurrentItem( Q3IconViewItem *item )
+d653 1
+a653 1
+    Q3IconViewItem *citem = mIcons->currentItem();
+d657 1
+a657 1
+	for ( Q3IconViewItem *itm = mIcons->firstItem(); itm; itm = itm->nextItem() )
+d660 1
+a660 1
+	for ( QList<IpodViewItem*>::const_iterator it = mLoadedIcons.begin(); it != mLoadedIcons.end(); it++ ) {
+d667 2
+a668 2
+	for ( QList<IpodViewItem*>::const_iterator it = mLoadedIcons.begin(); it != mLoadedIcons.end(); it++ ) {
+	    Q3IconViewItem *itm = *it;
+@
+
+
+1.12
+log
+@Quick Qt 4 port.
+This just gets everything to compile.
+I need to steal my "how to process Qt 4 libs" code to make the .app usable.
+@
+text
+@a173 12
+IconBrowserBase::IconBrowserBase( QWidget *parent, const char *name, Qt::WFlags f )
+    : Q3MainWindow( parent, name, f )
+{
+    setupUi( this );
+}
+
+IconBrowserBase::~IconBrowserBase()
+{
+}
+
+// ====================================================================
+
+d175 1
+a175 1
+    : IconBrowserBase( parent, name, f ),
+d180 2
+@
+
+
+1.11
+log
+@ipodicons 0.3.2
+@
+text
+@d27 1
+a27 1
+#include <qprocess.h>
+d31 1
+a31 1
+#include <qiconview.h>
+d35 1
+a35 1
+#include <qpopupmenu.h>
+d40 2
+a41 1
+#include <qbutton.h>
+d43 1
+a43 1
+class IpodViewItem : public QObject, public QIconViewItem
+d47 1
+a47 1
+    IpodViewItem( IconBrowser::ItemType type, const QString &filename, QIconView *parent, IconBrowser *_ib );
+d67 2
+a68 2
+IpodViewItem::IpodViewItem( IconBrowser::ItemType type, const QString &filename, QIconView *parent, IconBrowser *_ib )
+    : QObject( parent ), QIconViewItem( parent ),
+d78 1
+a78 1
+		QIconViewItem::setText( contents );
+d114 1
+a114 1
+		    i = i.scale( thumb, thumb, QImage::ScaleMin );
+d128 1
+a128 1
+                p.flush();
+d140 3
+a142 3
+    if ( mType != IconBrowser::Text || text.length() == QIconViewItem::text().length() ) {
+	if ( text != QIconViewItem::text() ) {
+	    QIconViewItem::setText( text );
+d174 13
+a186 1
+IconBrowser::IconBrowser( QWidget *parent, const char *name, WFlags f)
+d221 1
+a221 1
+void IconBrowser::slotIconMenu( QIconViewItem *_itm, const QPoint &p )
+d231 1
+a231 1
+    QPopupMenu pop( mIcons );
+d259 1
+a259 1
+    p.save( outFile, QImage::imageFormat( outFile ) );
+d342 1
+a342 1
+void IconBrowser::slotNewCurrentItem( QIconViewItem *item )
+d666 1
+a666 1
+    QIconViewItem *citem = mIcons->currentItem();
+d670 1
+a670 1
+	for ( QIconViewItem *itm = mIcons->firstItem(); itm; itm = itm->nextItem() )
+d673 1
+a673 1
+	for ( QValueList<IpodViewItem*>::const_iterator it = mLoadedIcons.begin(); it != mLoadedIcons.end(); it++ ) {
+d680 2
+a681 2
+	for ( QValueList<IpodViewItem*>::const_iterator it = mLoadedIcons.begin(); it != mLoadedIcons.end(); it++ ) {
+	    QIconViewItem *itm = *it;
+@
+
+
+1.10
+log
+@ipodicons 0.3.1
+@
+text
+@d183 2
+d303 2
+a304 1
+	if ( *it == "." || *it == ".." )
+d309 1
+a309 1
+		if ( (*it).find("bmap") != 0 )
+d313 1
+a313 1
+		if ( (*it).find("text") != 0 )
+d321 1
+a321 1
+	IpodViewItem *item = new IpodViewItem( (IconBrowser::ItemType)firmwareCombo->selectedId(), *it, mIcons, this );
+d399 3
+a402 1
+#endif
+d572 1
+d591 1
+d613 2
+@
+
+
+1.9
+log
+@ipodicons 0.3.0
+@
+text
+@a33 1
+#include <qcombobox.h>
+d38 3
+a40 1
+
+d75 2
+a76 3
+		QFile file( QString("%1/%2").arg(IPOD_DIR).arg(mFilename) );
+		file.open( IO_ReadOnly );
+		QString contents = file.readAll().data();
+d143 1
+a143 3
+		QFile file( QString("%1/%2").arg(IPOD_DIR).arg(mFilename) );
+		file.open( IO_WriteOnly );
+		file.writeBlock( text.local8Bit() );
+d181 1
+a181 3
+    // Setup firmwareCombo
+    firmwareCombo->insertItem( tr("Icons"), IconBrowser::Icon );
+    firmwareCombo->insertItem( tr("Text"), IconBrowser::Text );
+d183 1
+a183 4
+    // Iconview setup
+    connect( mIcons, SIGNAL(currentChanged(QIconViewItem*)), this, SLOT(slotNewCurrentItem(QIconViewItem*)) );
+
+    loadSession();
+d192 1
+d278 2
+a279 2
+    if ( QFileInfo(s).extension(false) != "pgm" )
+	s.append(".pgm");
+d281 4
+a284 10
+    {
+	// Copy the file out
+	QFile in( QString("%1/%2/%3").arg(IpodIcons::dataDir() ).arg(IPOD_DIR).arg(itm->filename()) );
+	in.open( IO_ReadOnly );
+	QFile out( s );
+	out.open( IO_WriteOnly );
+	out.writeBlock( in.readAll() );
+	out.close();
+	in.close();
+    }
+d292 2
+d304 1
+a304 1
+	switch ( firmwareCombo->currentItem() ) {
+d318 2
+a319 1
+	(void)new IpodViewItem( (IconBrowser::ItemType)firmwareCombo->currentItem(), *it, mIcons, this );
+d321 3
+d339 1
+a339 1
+    if ( firmwareCombo->currentItem() != IconBrowser::Icon || item == 0 ) {
+d566 1
+d584 1
+d633 39
+@
+
+
+1.8
+log
+@ipodicons 0.2.4
+@
+text
+@a18 3
+#include "settings.h"
+#include "appicon.h"
+#include "readme.h"
+d20 6
+a25 1
+#include "firmwaredialog.h"
+a32 1
+#include <qprogressdialog.h>
+d38 1
+a39 12
+#define UPDATES_PATH "/Contents/Resources/Updates/"
+#define IPOD_DIR "ipod"
+#define IPOD_RAW_DIR "ipod"
+
+#ifdef WRAP_IPODEDIT
+extern QString ipodicons_argv0;
+#define IPODEDIT << ipodicons_argv0
+#else
+#define IPODEDIT
+#endif
+
+// ====================================================================
+d57 1
+d106 1
+d110 19
+a128 2
+		QPixmap p( QString("%1/%2").arg(IPOD_DIR).arg(mFilename) );
+		setPixmap( p );
+d140 11
+a150 5
+	QIconViewItem::setText( text );
+	if ( mType == IconBrowser::Text ) {
+	    QFile file( QString("%1/%2").arg(IPOD_DIR).arg(mFilename) );
+	    file.open( IO_WriteOnly );
+	    file.writeBlock( text.local8Bit() );
+d165 8
+d177 1
+a177 2
+    mProgressDialog( 0 ),
+    ipodeditProc( 0 )
+d181 1
+a181 23
+#ifndef WRAP_IPODEDIT
+    // Check that ipodedit exists
+    if ( !QFileInfo( Settings::pathPrefix() + "/ipodedit" ).exists() ) {
+        QMessageBox::critical( this, tr("Missing Files!"), tr("<qt>You are missing ipodedit!"), QMessageBox::Ok, 0, 0 );
+        ::exit( 1 );
+        return;
+    }
+#endif
+
+    // Load in our icon (it's compiled into the executable)
+    QByteArray b;
+    b.setRawData( appIconData, sizeof(appIconData) );
+    setIcon( QPixmap( b ) );
+    b.resetRawData( appIconData, sizeof(appIconData) );
+
+    // Create the progress dialog
+    mProgressDialog = new QProgressDialog( tr("Importing Firmware"), tr("Abort"), 500, this, 0, true );
+    //mProgressDialog->setIcon( QPixmap() );
+    mProgressDialog->setMinimumDuration( 500 );
+    connect( mProgressDialog, SIGNAL(canceled()), this, SLOT(slotImportCanceled()) );
+
+    // Hide our status bar
+    //statusBar()->hide();
+d187 1
+d190 1
+a190 4
+    Settings::loadSession( session );
+    if ( !session.filename.isEmpty() )
+	setCaption( tr("iPodIcons - %1").arg( QFileInfo(session.filename).fileName() ) );
+    firmwareCombo->setCurrentItem( session.resourceIndex );
+d192 1
+a192 1
+    refreshDisplay( true );
+d198 2
+a199 82
+    Settings::saveSession( session );
+}
+
+void IconBrowser::slotSelectFirmware()
+{
+    TRACE("IconBrowser::slotSelectFirmware()");
+
+    // Pick a file
+    QString s = QFileDialog::getOpenFileName( getStartingDir(OpenFirmware), tr("All Files (*)"), this, 0, tr("Import Firmware") );
+    qDebug( "selected %s", s.local8Bit().data() );
+    if ( s.isEmpty() )
+	return;
+
+    setStartingDir( OpenFirmware, s );
+
+    // Cleanup first
+    slotClearFirmware();
+
+    session.filename = s;
+    setCaption( tr("iPodIcons - %1").arg( QFileInfo(session.filename).fileName() ) );
+
+    if ( QFileInfo(s).isDir() ) {
+	QString dir( s + UPDATES_PATH );
+	QDir d( dir );
+	QStringList glob = d.entryList("Firmware-*");
+	session.glob = glob;
+
+	FirmwareDialog dlg( this, 0, true );
+	//dlg.setIcon( QPixmap() );
+	int index = dlg.exec( glob, 0 );
+	if ( index != -1 ) {
+	    session.globIndex = index;
+	    slotLoadFirmware( dir + glob[index] );
+	} else {
+	    slotClearFirmware();
+	}
+    } else {
+	session.glob = QStringList() << QFileInfo(s).fileName();
+	session.globIndex = 0;
+	slotLoadFirmware( s );
+    }
+}
+
+void IconBrowser::slotClearFirmware()
+{
+    TRACE("IconBrowser::slotClearFirmware()");
+
+    session.filename = QString::null;
+    session.glob = QStringList();
+    session.globIndex = 0;
+    session.resourceIndex = 0;
+
+    setCaption( tr("iPodIcons") );
+
+    // Remove the firmware
+    QFile firmware( Settings::dataDir() + "/firmware" );
+    if ( firmware.exists() ) {
+        firmware.remove();
+    }
+
+    // Remove the ipod directory
+    removeDir( QString("%1/%2").arg(Settings::dataDir()).arg(IPOD_DIR) );
+    removeDir( QString("%1/%2").arg(Settings::dataDir()).arg(IPOD_RAW_DIR) );
+
+    refreshDisplay( true );
+}
+
+void IconBrowser::slotSaveFirmware()
+{
+    saveFirmware( true );
+}
+
+void IconBrowser::slotSaveNewFirmware()
+{
+    saveFirmware( false );
+}
+
+void IconBrowser::slotAbout()
+{
+    TRACE("IconBrowser::slotAbout()");
+    QMessageBox::about( this, tr("About iPodIcons"),
+               QString("<qt></b>%1").arg(readme_txt) );
+d204 1
+a204 1
+    TRACE("IconBrowser::slotFirmwareCombo(%d)", index);
+d208 1
+a208 1
+	refreshDisplay( true );
+a227 81
+void IconBrowser::slotLoadFirmware( const QString &filename )
+{
+    TRACE("IconBrowser::slotLoadFirmware(%s)", filename.local8Bit().data());
+
+    // Popup a progress dialog
+    mProgressDialog->setProgress( 0, 100 );
+
+    qDebug( "filename %s", filename.local8Bit().data() );
+    {
+	// Copy the firmware
+	QFile in( filename );
+	in.open( IO_ReadOnly );
+	QFile out( Settings::dataDir() + "/firmware" );
+	out.open( IO_WriteOnly );
+	out.writeBlock( in.readAll() );
+	out.close();
+	in.close();
+    }
+
+    // Extract the pics
+    ipodeditProc = new QProcess( this );
+    ipodeditProc->setArguments( QStringList() IPODEDIT << Settings::pathPrefix() + "/ipodedit" << Settings::dataDir() + "/firmware" );
+    connect( ipodeditProc, SIGNAL(processExited()), this, SLOT(slotIpodeditDone()) );
+    connect( ipodeditProc, SIGNAL(readyReadStdout()), this, SLOT(slotIpodeditData()) );
+    connect( ipodeditProc, SIGNAL(readyReadStderr()), this, SLOT(slotIpodeditData()) );
+    ipodeditProc->start();
+}
+
+void IconBrowser::slotSaveFirmware( const QString &filename )
+{
+    TRACE("IconBrowser::slotSaveFirmware(%s)", filename.local8Bit().data());
+    {
+	// Copy the firmware
+	QFile in( Settings::dataDir() + "/firmware" );
+	in.open( IO_ReadOnly );
+	qDebug( "saving to %s", filename.local8Bit().data() );
+	QFile out( filename );
+	out.open( IO_WriteOnly );
+	out.writeBlock( in.readAll() );
+	out.close();
+	in.close();
+    }
+}
+
+void IconBrowser::slotIpodeditData()
+{
+    TRACE("IconBrowser::slotIpodeditData()");
+    QString line;
+    while ( !(line = ipodeditProc->readLineStdout()).isNull() ) {
+        qDebug( "ipodedit: %s", line.local8Bit().data() );
+        if ( line.find("Progress: total ") == 0 ) {
+	    qDebug( "total progress '%s'", line.mid(16).local8Bit().data() );
+	    mProgressDialog->setProgress(0, line.mid(16).toInt());
+	} else if ( line.find("Progress: item ") == 0 ) {
+	    qDebug( "item progress '%s'", line.mid(15).local8Bit().data() );
+	    mProgressDialog->setProgress(line.mid(15).toInt());
+	}
+    }
+    while ( !(line = ipodeditProc->readLineStderr()).isNull() )
+	qWarning( "ipodedit: %s", line.local8Bit().data() );
+}
+
+void IconBrowser::slotIpodeditDone()
+{
+    TRACE("IconBrowser::slotIpodeditDone()");
+    delete ipodeditProc;
+    ipodeditProc = 0;
+
+    mProgressDialog->reset();
+
+    refreshDisplay( false );
+}
+
+void IconBrowser::slotImportCanceled()
+{
+    TRACE("IconBrowser::slotImportCanceled()");
+    mProgressDialog->setProgress( 99, 100 );
+    ipodeditProc->tryTerminate();
+    QTimer::singleShot( 5000, ipodeditProc, SLOT(kill()) );
+}
+
+d230 1
+a230 1
+    TRACE("IconBrowser::importItem(%s)", itm->text().local8Bit().data());
+d233 1
+a233 1
+    QString s = QFileDialog::getOpenFileName( getStartingDir(LoadPng), "All Files (*)", this, 0, tr("Import Icon") );
+d238 1
+a238 1
+    setStartingDir( LoadPng, s );
+d245 5
+a249 1
+    QString outFile = QString("%1/%2/%3").arg(Settings::dataDir() ).arg(IPOD_DIR).arg(itm->text());
+d251 1
+d253 16
+a268 7
+    // import the pic
+    ipodeditProc = new QProcess( this );
+    ipodeditProc->setArguments( QStringList() IPODEDIT << Settings::pathPrefix() + "/ipodedit" << Settings::dataDir() + "/firmware" << outFile );
+    connect( ipodeditProc, SIGNAL(processExited()), this, SLOT(slotIpodeditDone()) );
+    connect( ipodeditProc, SIGNAL(readyReadStdout()), this, SLOT(slotIpodeditData()) );
+    connect( ipodeditProc, SIGNAL(readyReadStderr()), this, SLOT(slotIpodeditData()) );
+    ipodeditProc->start();
+d273 2
+a274 2
+    TRACE("IconBrowser::exportItem(%s)", itm->text().local8Bit().data());
+    qDebug( "Saving %s", itm->text().local8Bit().data() );
+d277 1
+a277 1
+    QString s = QFileDialog::getSaveFileName( getStartingDir(SavePng), "All Files (*)", this, 0, tr("Export Icon") );
+d282 1
+a282 1
+    setStartingDir( SavePng, s );
+d289 1
+a289 1
+	QFile in( QString("%1/%2/%3").arg(Settings::dataDir() ).arg(IPOD_DIR).arg(itm->text()) );
+d299 1
+a299 1
+void IconBrowser::refreshDisplay( bool clear )
+d301 1
+a301 1
+    TRACE("IconBrowser::refreshDisplay(%d)", clear);
+d303 1
+a303 2
+    if ( clear )
+	mIcons->clear();
+d305 1
+a305 1
+    QDir ipodPics( QString("%1/%2").arg(Settings::dataDir()).arg(IPOD_DIR) );
+a308 2
+    IpodViewItem *itm = dynamic_cast<IpodViewItem*>(mIcons->currentItem());
+    qDebug( "current item %x", (int)itm );
+a309 1
+    //int count = 0;
+d328 15
+a342 6
+	if ( clear || itm == 0 ) {
+	    (void)new IpodViewItem( (IconBrowser::ItemType)firmwareCombo->currentItem(), *it, mIcons, this );
+	} else if ( *it == itm->text() ) {
+	    itm->refresh();
+	}
+	//count++;
+d344 4
+a347 3
+#if 0
+    if ( count ) {
+        //mIcons->update();
+d349 33
+a381 2
+        //QMessageBox::warning( this, tr("No Pictures"), tr("<qt>There were no pictures in the firmware!"), QMessageBox::Ok, 0, 0 );
+        //slotClearFirmware();
+d383 6
+d392 1
+a392 1
+QString IconBrowser::getStartingDir( Dialog type )
+d394 14
+a407 2
+    Settings settings;
+    return settings.readEntry( QString("startingDir%1").arg( type ), getenv("HOME") );
+d410 1
+a410 1
+void IconBrowser::setStartingDir( Dialog type, const QString &file )
+d412 7
+a418 2
+    Settings settings;
+    settings.writeEntry( QString("startingDir%1").arg( type ), QFileInfo(file).dirPath(true) );
+d421 1
+a421 1
+void IconBrowser::saveFirmware( bool overwrite )
+d423 3
+a425 5
+    TRACE("IconBrowser::saveFirmware(%d)", overwrite);
+    // Pick a file
+    QString s = overwrite?
+	QFileDialog::getOpenFileName( getStartingDir(SaveFirmware), tr("All Files (*)"), this, 0, tr("Export Firmware") ):
+	QFileDialog::getSaveFileName( getStartingDir(SaveFirmware), tr("All Files (*)"), this, 0, tr("Export Firmware") );
+d430 42
+a471 1
+    setStartingDir( SaveFirmware, s );
+d473 5
+a477 12
+    if ( QFileInfo(s).isDir() ) {
+	QString dir( s + UPDATES_PATH );
+	QDir d( dir );
+	QStringList glob = d.entryList("Firmware-*");
+
+	FirmwareDialog dlg( this, 0, true );
+	//dlg.setIcon( QPixmap() );
+	int index = dlg.exec( glob, glob.findIndex( session.glob[session.globIndex] ) );
+	if ( index != -1 )
+	    slotSaveFirmware( dir + glob[index] );
+    } else {
+	slotSaveFirmware( s );
+d479 25
+d506 1
+a506 1
+void IconBrowser::slotImportItem()
+d508 1
+d516 1
+a516 1
+void IconBrowser::slotExportItem()
+d518 1
+d526 24
+a549 1
+void IconBrowser::slotNewCurrentItem( QIconViewItem *item )
+d551 17
+a567 8
+    if ( item != 0 ) {
+	IpodViewItem *itm = dynamic_cast<IpodViewItem*>(item);
+	Q_ASSERT( itm );
+	if ( !itm )
+	    return;
+	statusBar()->message( itm->filename() );
+    } else {
+	statusBar()->clear();
+d569 4
+d574 11
+a584 6
+    if ( firmwareCombo->currentItem() != IconBrowser::Icon || item == 0 ) {
+	actionImportItem->setEnabled( false );
+	actionExportItem->setEnabled( false );
+    } else {
+	actionImportItem->setEnabled( true );
+	actionExportItem->setEnabled( true );
+d586 3
+d591 1
+a591 1
+void IconBrowser::removeDir( const QString &dir )
+d593 41
+a633 9
+    bool ok;
+    QDir ipodPics( dir );
+    if ( ipodPics.exists() ) {
+	QStringList files = ipodPics.entryList();
+	for ( QStringList::Iterator it = files.begin(); it != files.end(); it++ ) {
+	    if ( *it == "." || *it == ".." )
+		continue;
+	    ok = ipodPics.remove( *it );
+	    Q_ASSERT( ok );
+a634 2
+	ok = ipodPics.rmdir( dir );
+	Q_ASSERT( ok );
+d636 1
+@
+
+
+1.7
+log
+@ipodicons 0.2.3
+@
+text
+@d2 1
+a2 1
+ * Copyright (C) 2004  Lincoln Ramsay
+d36 1
+d38 3
+a40 1
+static const QString updates_path = "/Contents/Resources/Updates/";
+a48 7
+static const char *gPicsDirs[] = {
+    "ipod-pics",
+    0, //"ipod-fonts",
+    0, //"ipod-text",
+    0
+};
+
+d55 1
+a55 1
+    IpodViewItem( QIconView *parent, IconBrowser *_ib, IpodItem *_ipod );
+d58 5
+a62 2
+    const char *picsDir();
+    const IpodItem *ipodItem();
+d65 2
+a66 2
+    void slotLoadPng();
+    void slotSavePng();
+d70 2
+a71 1
+    IpodItem *ipod;
+d74 1
+a74 1
+IpodViewItem::IpodViewItem( QIconView *parent, IconBrowser *_ib, IpodItem *_ipod )
+d77 2
+a78 1
+    ipod( _ipod )
+d80 17
+a96 3
+    setText( ipod->filename ); // + "\n" + ipod->message );
+    QPixmap p( QString("%1/%2").arg(gPicsDirs[ipod->type]).arg(ipod->filename) );
+    setPixmap( p );
+d103 6
+a108 1
+const char *IpodViewItem::picsDir()
+d110 1
+a110 1
+    return gPicsDirs[ipod->type];
+d113 1
+a113 1
+const IpodItem *IpodViewItem::ipodItem()
+d115 23
+a137 1
+    return ipod;
+d140 1
+a140 1
+void IpodViewItem::slotLoadPng()
+d142 1
+a142 1
+    ib->loadPng( this );
+d145 1
+a145 1
+void IpodViewItem::slotSavePng()
+d147 1
+a147 1
+    ib->savePng( this );
+d157 1
+a157 1
+    TRACE("IconBrowser::IconBrowser");
+d175 1
+a175 1
+    mProgressDialog = new QProgressDialog( tr("Importing Firmware"), tr("Abort"), 200, this, 0, true );
+d177 1
+a177 1
+    mProgressDialog->setMinimumDuration( 200 );
+d181 7
+a187 1
+    statusBar()->hide();
+d192 1
+d194 1
+a194 1
+    refreshDisplay();
+d199 1
+a199 1
+    TRACE("IconBrowser::~IconBrowser");
+d205 1
+a205 1
+    TRACE("IconBrowser::slotSelectFirmware");
+d222 1
+a222 1
+	QString dir( s + updates_path );
+d245 1
+a245 1
+    TRACE("IconBrowser::slotClearFirmware");
+d260 3
+a262 18
+    // Remove the ipod-* directories
+    bool ok;
+    for ( const char **picsdir = gPicsDirs; *picsdir; picsdir++ ) {
+	QString dir = QString("%1/%2").arg(Settings::dataDir()).arg(*picsdir);
+	qDebug( "dir %s", dir.local8Bit().data() );
+	QDir ipodPics( dir );
+	if ( ipodPics.exists() ) {
+	    QStringList files = ipodPics.entryList();
+	    for ( QStringList::Iterator it = files.begin(); it != files.end(); it++ ) {
+		if ( *it == "." || *it == ".." )
+		    continue;
+		ok = ipodPics.remove( *it );
+		Q_ASSERT( ok );
+	    }
+	    ok = ipodPics.rmdir( dir );
+	    Q_ASSERT( ok );
+	}
+    }
+d264 1
+a264 6
+    for ( QMap<QString,IpodItem*>::const_iterator it = session.items.begin(); it != session.items.end(); it++ ) {
+	delete (*it);
+    }
+    session.items.clear();
+
+    refreshDisplay();
+d279 1
+a279 1
+    TRACE("IconBrowser::slotAbout");
+d286 2
+a287 6
+    TRACE("IconBrowser::slotFirmwareCombo");
+    qDebug( "session %d combo %d", session.resourceIndex, index );
+#ifndef FIXME
+    if ( index != 0 )
+	return;
+#endif
+d290 1
+a290 1
+	refreshDisplay();
+d296 1
+a296 1
+    TRACE("IconBrowser::slotIconMenu");
+d299 3
+a301 2
+    Q_ASSERT( itm );
+    if ( !itm )
+d305 2
+a306 2
+    pop.insertItem( tr("&Import Icon"), itm, SLOT(slotLoadPng()), 0 );
+    pop.insertItem( tr("&Export Icon"), itm, SLOT(slotSavePng()), 0 );
+d312 1
+a312 1
+    TRACE("IconBrowser::slotLoadFirmware");
+d340 1
+a340 1
+    TRACE("IconBrowser::slotSaveFirmware");
+d356 1
+a356 1
+    TRACE("IconBrowser::slotIpodeditData");
+a357 1
+    IpodItem *ipod = 0;
+d360 6
+a365 17
+        if ( line.find("Image at 0x") == 0 ) {
+            int progress = mProgressDialog->progress();
+            int totalSteps = mProgressDialog->totalSteps();
+            if ( totalSteps < progress + 1 )
+                totalSteps = (int)(totalSteps * 1.5);
+            mProgressDialog->setProgress( progress + 1, totalSteps );
+	    ipod = new IpodItem;
+	    ipod->address = line.mid(9, line.find(",") - 9);
+	    ipod->type = IpodItem::Icon;
+	    ipod->message = line;
+	    qDebug( "creating IpodItem %s", ipod->address.local8Bit().data() );
+	    session.items.insert( ipod->address, ipod );
+	} else if ( line.find("Total pictures found: ") == 0 ) {
+	    ipod = 0;
+        } else if ( ipod ) {
+	    ipod->message.append("\n");
+	    ipod->message.append(line);
+d374 1
+a374 1
+    TRACE("IconBrowser::slotIpodeditDone");
+d380 1
+a380 1
+    refreshDisplay();
+d385 1
+a385 1
+    TRACE("IconBrowser::slotImportCanceled");
+d391 1
+a391 1
+void IconBrowser::loadPng( IpodViewItem *itm )
+d393 1
+a393 1
+    TRACE("IconBrowser::loadPng");
+d408 1
+a408 1
+    QString outFile = QString("%1/%2/%3").arg(Settings::dataDir() ).arg(itm->picsDir()).arg(itm->ipodItem()->filename);
+a410 2
+    mProgressDialog->setProgress( 0, 100 );
+
+d420 1
+a420 1
+void IconBrowser::savePng( IpodViewItem *itm )
+d422 2
+a423 2
+    TRACE("IconBrowser::savePng");
+    qDebug( "Saving %s", itm->ipodItem()->filename.local8Bit().data() );
+d438 1
+a438 1
+	QFile in( QString("%1/%2/%3").arg(Settings::dataDir() ).arg(itm->picsDir()).arg(itm->ipodItem()->filename) );
+d448 1
+a448 1
+void IconBrowser::refreshDisplay()
+d450 1
+a450 1
+    TRACE("IconBrowser::refreshDisplay");
+d452 2
+a453 1
+    mIcons->clear();
+d455 1
+a455 1
+    QDir ipodPics( QString("%1/%2").arg(Settings::dataDir()).arg(gPicsDirs[session.resourceIndex]) );
+d459 2
+d462 1
+a462 1
+    int count = 0;
+d466 12
+a477 10
+	QString file = *it;
+	int offset = file.find("0x");
+	int len = file.find(".") - offset;
+	QString addr = file.mid( offset, len );
+	//qDebug( "file %s addr %s", file.local8Bit().data(), addr.local8Bit().data() );
+	if ( session.items.contains(addr) ) {
+	    IpodItem *ipod = session.items[addr];
+	    ipod->filename = file;
+	    (void)new IpodViewItem( mIcons, this, ipod );
+	    count++;
+d479 8
+d488 1
+d493 1
+a493 1
+        slotClearFirmware();
+d495 1
+d512 1
+a512 1
+    TRACE("IconBrowser::saveFirmware");
+d524 1
+a524 1
+	QString dir( s + updates_path );
+d535 56
+@
+
+
+1.6
+log
+@ipodicons 0.2.2
+@
+text
+@d48 2
+a49 1
+    "ipod-fonts",
+d55 1
+a55 1
+class IpodItem : public QObject, public QIconViewItem
+d59 2
+a60 4
+    enum ItemType { Icon = 0, Font = 1, Test = 2 };
+
+    IpodItem( QIconView *parent, const QString &filename, IconBrowser *_ib, IpodItem::ItemType type );
+    virtual ~IpodItem();
+d63 1
+d71 1
+a71 1
+    ItemType mType;
+d74 1
+a74 1
+IpodItem::IpodItem( QIconView *parent, const QString &filename, IconBrowser *_ib, IpodItem::ItemType type )
+d77 1
+a77 1
+    mType( type )
+d79 2
+a80 2
+    setText( filename );
+    QPixmap p( QString("%1/%2").arg(gPicsDirs[mType]).arg(filename) );
+d84 5
+a88 1
+IpodItem::~IpodItem()
+d90 1
+d93 1
+a93 1
+const char *IpodItem::picsDir()
+d95 1
+a95 1
+    return gPicsDirs[mType];
+d98 1
+a98 1
+void IpodItem::slotLoadPng()
+d103 1
+a103 1
+void IpodItem::slotSavePng()
+d133 1
+a133 1
+    mProgressDialog = new QProgressDialog( tr("Importing Firmware"), tr("Abort"), 200, this, 0, TRUE );
+d142 3
+d160 1
+a160 1
+    qDebug( "selected %s", s.latin1() );
+d169 2
+a170 1
+    session.file = s;
+d178 1
+a178 1
+	FirmwareDialog dlg( this, 0, TRUE );
+d180 1
+a180 1
+	int index = dlg.exec( glob, glob.findIndex( firmwareCombo->currentText() ) );
+d198 1
+a198 1
+    session.file = QString::null;
+d201 3
+d215 1
+a215 1
+	qDebug( "dir %s", dir.latin1() );
+d230 5
+d240 2
+a241 6
+    TRACE("IconBrowser::slotSaveFirmware");
+    // Pick a file
+    QString s = QFileDialog::getSaveFileName( getStartingDir(SaveFirmware), tr("All Files (*)"), this, 0, tr("Export Firmware") );
+    qDebug( "selected %s", s.latin1() );
+    if ( s.isEmpty() )
+	return;
+d243 3
+a245 15
+    setStartingDir( SaveFirmware, s );
+
+    if ( QFileInfo(s).isDir() ) {
+	QString dir( s + updates_path );
+	QDir d( dir );
+	QStringList glob = d.entryList("Firmware-*");
+
+	FirmwareDialog dlg( this, 0, TRUE );
+	//dlg.setIcon( QPixmap() );
+	int index = dlg.exec( glob, glob.findIndex( firmwareCombo->currentText() ) );
+	if ( index != -1 )
+	    slotSaveFirmware( glob[index] );
+    } else {
+	slotSaveFirmware( s );
+    }
+d258 8
+a265 7
+    qDebug( "session %d combo %d", session.globIndex, index );
+    if ( session.globIndex != index ) {
+	session.globIndex = index;
+	if ( session.glob.count() > 1 ) {
+	    slotClearFirmware();
+	    slotLoadFirmware( session.file + updates_path + session.glob[index] );
+	}
+d273 2
+a274 1
+    IpodItem *itm = dynamic_cast<IpodItem*>(_itm);
+d279 2
+a280 2
+    pop.insertItem( tr("Import"), itm, SLOT(slotLoadPng()), 0 );
+    pop.insertItem( tr("Export"), itm, SLOT(slotSavePng()), 0 );
+d291 1
+a291 1
+    qDebug( "filename %s", filename.latin1() );
+d308 1
+d319 1
+d330 1
+a330 1
+    //TRACE("IconBrowser::slotIpodeditData");
+d332 1
+d334 1
+a334 1
+        qDebug( "%s", line.latin1() );
+d341 12
+a352 1
+        }
+d354 2
+d377 1
+a377 1
+void IconBrowser::loadPng( IpodItem *itm )
+d382 2
+a383 2
+    QString s = QFileDialog::getOpenFileName( getStartingDir(LoadPng), tr("All Files (*)"), this, 0, tr("Import Icon") );
+    qDebug( "selected %s", s.latin1() );
+d389 4
+a392 9
+    {
+	// Copy the file in
+	QFile in( s );
+	in.open( IO_ReadOnly );
+	QFile out( QString("%1/%2/%3").arg(Settings::dataDir() ).arg(itm->picsDir()).arg(itm->text()) );
+	out.open( IO_WriteOnly );
+	out.writeBlock( in.readAll() );
+	out.close();
+	in.close();
+d394 2
+d401 1
+a401 1
+    ipodeditProc->setArguments( QStringList() IPODEDIT << Settings::pathPrefix() + "/ipodedit" << Settings::dataDir() + "/firmware" << QString("%1/%2/%3").arg(Settings::dataDir()).arg(itm->picsDir()).arg(itm->text()) );
+d404 1
+d408 1
+a408 1
+void IconBrowser::savePng( IpodItem *itm )
+d411 1
+a411 1
+    qDebug( "Saving %s", itm->text().latin1() );
+d414 2
+a415 2
+    QString s = QFileDialog::getSaveFileName( getStartingDir(SavePng), tr("All Files (*)"), this, 0, tr("Export Icon") );
+    qDebug( "selected %s", s.latin1() );
+d421 3
+d426 1
+a426 1
+	QFile in( QString("%1/%2/%3").arg(Settings::dataDir() ).arg(itm->picsDir()).arg(itm->text()) );
+a439 4
+    firmwareCombo->clear();
+    firmwareCombo->insertStringList( session.glob );
+    firmwareCombo->setCurrentItem( session.globIndex );
+
+d442 1
+a442 1
+    QDir ipodPics( QString("%1/%2").arg(Settings::dataDir()).arg(gPicsDirs[IpodItem::Icon]) );
+a445 1
+    Q_ASSERT( ipodPics.exists() );
+d451 11
+a461 2
+        count++;
+	(void)new IpodItem( mIcons, *it, this, IpodItem::Icon );
+d464 1
+a464 1
+        mIcons->update();
+d466 1
+a466 1
+        QMessageBox::warning( this, tr("No Pictures"), tr("<qt>There were no pictures in the firmware!"), QMessageBox::Ok, 0, 0 );
+d474 1
+a474 1
+    return settings.readEntry( QString("/startingDir%1").arg( type ), getenv("HOME") );
+d480 29
+a508 1
+    settings.writeEntry( QString("/startingDir%1").arg( type ), QFileInfo(file).dirPath(TRUE) );
+@
+
+
+1.5
+log
+@ipodicons 0.2.1
+@
+text
+@d46 6
+d58 3
+a60 1
+    IpodItem( QIconView *parent, const QString &filename, IconBrowser *_ib );
+d63 2
+d71 1
+d74 1
+a74 1
+IpodItem::IpodItem( QIconView *parent, const QString &filename, IconBrowser *_ib )
+d76 2
+a77 1
+    ib( _ib )
+d80 1
+a80 1
+    QPixmap p( QString("ipod-pics/") + filename );
+d88 5
+d199 1
+a199 1
+    // Remove the ipod-pics directory
+d201 13
+a213 7
+    QDir ipodPics( Settings::dataDir() + "/ipod-pics" );
+    if ( ipodPics.exists() ) {
+	QStringList files = ipodPics.entryList();
+	for ( QStringList::Iterator it = files.begin(); it != files.end(); it++ ) {
+	    if ( *it == "." || *it == ".." )
+		continue;
+	    ok = ipodPics.remove( *it );
+a215 2
+	ok = ipodPics.rmdir( Settings::dataDir() + "/ipod-pics" );
+	Q_ASSERT( ok );
+d251 1
+a251 1
+               QString("<qt>%1").arg(readme_txt) );
+d374 1
+a374 1
+	QFile out( Settings::dataDir() + "/ipod-icons/" + itm->text() );
+d385 1
+a385 1
+    ipodeditProc->setArguments( QStringList() IPODEDIT << Settings::pathPrefix() + "/ipodedit" << Settings::dataDir() + "/firmware" << Settings::dataDir() + "/ipod-pics/" + itm->text() );
+d406 1
+a406 1
+	QFile in( Settings::dataDir() + "/ipod-icons/" + itm->text() );
+d426 1
+a426 1
+    QDir ipodPics( Settings::dataDir() + "/ipod-pics" );
+d437 1
+a437 1
+	(void)new IpodItem( mIcons, *it, this );
+@
+
+
+1.4
+log
+@ipodicons 0.2.0
+@
+text
+@d25 1
+a27 1
+#include <qprocess.h>
+d39 7
+d90 2
+a91 2
+    ipodeditProc( 0 ),
+    mProgressDialog( 0 )
+d94 2
+d102 1
+a131 2
+    if ( ipodeditProc != 0 )
+	return;
+a134 1
+#ifdef PROGRAM_DEBUG
+a135 1
+#endif
+a140 3
+    // Popup a progress dialog
+    mProgressDialog->setProgress( 0, 100 );
+
+d151 10
+a160 2
+	session.globIndex = 0;
+	slotLoadFirmware( dir + glob.first() );
+a204 1
+#ifdef PROGRAM_DEBUG
+a205 1
+#endif
+d230 1
+a230 1
+               readme_txt );
+d240 1
+a240 1
+	    mProgressDialog->setProgress( 0, 100 );
+d263 4
+a278 2
+    mProgressDialog->setProgress( 1 );
+
+a279 1
+    qDebug( "doing the qprocess bit" );
+d281 1
+a281 1
+    ipodeditProc->setArguments( QStringList() << Settings::pathPrefix() + "/ipodedit" << Settings::dataDir() + "/firmware" );
+a283 4
+    qDebug( "starting qprocess" );
+#if defined(Q_WS_MACX) && defined(DISABLE_QPROCESS)
+    slotIpodeditDone();
+#else
+a284 2
+#endif
+    qDebug( "done starting" );
+d304 1
+a304 1
+    TRACE("IconBrowser::slotIpodeditData");
+a306 1
+#ifdef PROGRAM_DEBUG
+a307 1
+#endif
+a340 3
+    if ( ipodeditProc != 0 )
+	return;
+
+a342 1
+#ifdef PROGRAM_DEBUG
+a343 1
+#endif
+d364 1
+a364 1
+    ipodeditProc->setArguments( QStringList() << Settings::pathPrefix() + "/ipodedit" << Settings::dataDir() + "/firmware" << Settings::dataDir() + "/ipod-pics/" + itm->text() );
+a366 4
+    qDebug( "starting qprocess" );
+#if defined(Q_WS_MACX) && defined(DISABLE_QPROCESS)
+    slotIpodeditDone();
+#else
+a367 3
+#endif
+    qDebug( "done starting" );
+
+a376 1
+#ifdef PROGRAM_DEBUG
+a377 1
+#endif
+@
+
+
+1.3
+log
+@importing ipodicons 0.1.3
+@
+text
+@d23 1
+d33 5
+d45 1
+a45 1
+    IpodItem( QIconView *parent = 0, const QString &filename = QString::null );
+d47 7
+d56 3
+a58 2
+IpodItem::IpodItem( QIconView *parent, const QString &filename )
+    : QObject( parent ), QIconViewItem( parent )
+d69 10
+a93 3
+    // This might pick up a previous edit
+    refreshDisplay();
+
+d99 12
+d116 1
+d126 1
+a126 1
+    QString s = QFileDialog::getOpenFileName( getStartingDir(), tr("All Files (*)"), this, 0, tr("Import Firmware") );
+d133 1
+a133 1
+    setStartingDir( s );
+a135 5
+    if ( !mProgressDialog ) {
+        mProgressDialog = new QProgressDialog( tr("Importing Firmware"), tr("Abort"), 100, this, 0, TRUE );
+        mProgressDialog->setMinimumDuration( 200 );
+        connect( mProgressDialog, SIGNAL(canceled()), this, SLOT(slotImportCanceled()) );
+    }
+d141 1
+a141 2
+    // Set the caption
+    setCaption( tr("iPodIcons - %1").arg( QFileInfo(s).fileName() ) );
+d143 11
+a153 9
+    {
+	// Copy the firmware
+	QFile in( s );
+	in.open( IO_ReadOnly );
+	QFile out( Settings::dataDir() + "/firmware" );
+	out.open( IO_WriteOnly );
+	out.writeBlock( in.readAll() );
+	out.close();
+	in.close();
+a154 9
+
+    mProgressDialog->setProgress( 1 );
+
+    // Extract the pics
+    ipodeditProc = new QProcess( this );
+    ipodeditProc->setArguments( QStringList() << Settings::pathPrefix() + "/ipodedit" << Settings::dataDir() + "/firmware" );
+    connect( ipodeditProc, SIGNAL(processExited()), this, SLOT(slotIpodeditDone()) );
+    connect( ipodeditProc, SIGNAL(readyReadStdout()), this, SLOT(slotIpodeditData()) );
+    ipodeditProc->start();
+d161 3
+a163 1
+    setCaption( tr("iPodIcons") );
+d193 1
+a193 1
+    QString s = QFileDialog::getSaveFileName( getStartingDir(), tr("All Files (*)"), this, 0, tr("Export Firmware") );
+d200 1
+a200 1
+    setStartingDir( s );
+d202 53
+d257 1
+a257 1
+	QFile in( Settings::dataDir() + "/firmware" );
+d259 1
+a259 1
+	QFile out( s );
+d265 16
+d283 1
+a283 1
+void IconBrowser::slotAbout()
+d285 11
+a295 3
+    TRACE("IconBrowser::slotAbout");
+    QMessageBox::about( this, tr("About iPodIcons"),
+               readme_txt );
+d335 72
+d411 4
+d428 1
+a428 1
+	(void)new IpodItem( mIcons, *it );
+d438 1
+a438 1
+QString IconBrowser::getStartingDir()
+d441 1
+a441 1
+    return settings.readEntry( "/startingDir", getenv("HOME") );
+d444 1
+a444 1
+void IconBrowser::setStartingDir( const QString &file )
+d447 1
+a447 1
+    settings.writeEntry( "/startingDir", QFileInfo(file).dirPath(TRUE) );
+@
+
+
+1.2
+log
+@importing ipodicons 0.1.2
+@
+text
+@d21 1
+a22 1
+#include "version.h"
+a98 1
+    setCaption( tr("iPodIcons - %1").arg( QFileInfo(s).fileName() ) );
+d112 3
+d195 1
+a195 3
+            tr("<qt>iPodIcons "
+               VERSION
+               " lets you view the icons in a firmware.") );
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d19 4
+d30 2
+d33 1
+a33 6
+#include <stdlib.h>
+#include <unistd.h>
+
+#ifdef Q_WS_MACX
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+d40 1
+a40 1
+    ~IpodItem();
+d59 2
+a60 1
+    ipodeditProc( 0 )
+d62 6
+a67 19
+#ifdef Q_WS_MACX
+    // CFBundle will give us the full pathname to the Application's bundle
+    CFURLRef pluginRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+    CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef, kCFURLPOSIXPathStyle);
+    const char *pathPtr = CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding());
+    Q_ASSERT( pathPtr != NULL );
+    pathPrefix = pathPtr;
+    pathPrefix.append( "/Contents/Resources" );
+#else
+    pathPrefix = qApp->applicationDirPath();
+#endif
+
+    // Check that critical files exist
+    char *cmnds[2] = { "/ipodedit", "/checksum2" };
+    for ( int i = 0; i < 2; i++ ) {
+	if ( !QFileInfo( QFile(pathPrefix + cmnds[i]) ).exists() ) {
+	    QMessageBox::critical( this, tr("Missing Files!"), tr("<qt>You are missing some files. Please reinstall"), QMessageBox::Ok, 0, 0 );
+	    ::exit( 1 );
+	}
+a69 18
+    // Setup the data dir
+    dataDir = getenv("HOME");
+    dataDir.append( "/.iPodIcons" );
+    QDir homeDir( dataDir );
+    bool ok;
+    if ( !homeDir.exists() ) {
+#ifdef PROGRAM_DEBUG
+	qDebug( "mkdir %s", dataDir.latin1() );
+#endif
+	ok = homeDir.mkdir( dataDir );
+	Q_ASSERT( ok );
+    }
+#ifdef PROGRAM_DEBUG
+    qDebug( "cd %s", dataDir.latin1() );
+#endif
+    ok = chdir( dataDir.local8Bit() ) == 0;
+    Q_ASSERT( ok );
+
+d72 6
+d82 1
+d87 1
+d92 1
+a92 1
+    QString s = QFileDialog::getOpenFileName( getenv("HOME"), tr("All Files (*)"), this, 0, tr("Select a Firmware") );
+d99 48
+a146 1
+    // Remove any old ipod-pics directory that exists...
+d148 1
+a148 1
+    QDir ipodPics( dataDir + "/ipod-pics" );
+d157 1
+a157 1
+	ok = ipodPics.rmdir( dataDir + "/ipod-pics" );
+d161 53
+a213 5
+    // Extract the pics
+    ipodeditProc = new QProcess( this );
+    ipodeditProc->setArguments( QStringList() << pathPrefix + "/ipodedit" << s );
+    connect( ipodeditProc, SIGNAL(processExited()), this, SLOT(slotIpodeditDone()) );
+    ipodeditProc->start();
+d218 1
+d222 1
+a222 3
+#ifdef PROGRAM_DEBUG
+    qDebug( "ipodedit done" );
+#endif
+d227 8
+d237 1
+a237 3
+#ifdef PROGRAM_DEBUG
+    qDebug( "refreshDisplay" );
+#endif
+d241 1
+a241 1
+    QDir ipodPics( dataDir + "/ipod-pics" );
+d247 1
+d251 1
+d254 18
+a271 1
+    mIcons->update();
+@
+
+
+1.1.1.1
+log
+@adding ipodicons
+@
+text
+@@

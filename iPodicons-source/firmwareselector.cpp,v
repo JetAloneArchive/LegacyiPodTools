@@ -1,0 +1,816 @@
+head	1.6;
+access;
+symbols
+	ipodicons-0_3_6:1.6
+	ipodicons-0_3_5:1.6
+	ipodicons-0_3_4:1.6
+	qt4_port:1.5.0.2
+	ipodicons-0_3_3:1.3
+	ipodicons-0_3_2:1.3
+	ipodicons-0_3_1:1.2
+	ipodicons-0_3_0:1.1;
+locks; strict;
+comment	@// @;
+
+
+1.6
+date	2005.09.14.02.35.46;	author a1291762;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2005.07.12.14.05.45;	author a1291762;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2005.07.08.14.18.57;	author a1291762;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.03.13.02.07.22;	author link;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.03.13.02.06.47;	author link;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.02.05.54;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.6
+log
+@Throw away the Qt 4 work (the qt4_port branch can be used to continue it).
+Trying to manually sync to pre-qt4 state (might not be there).
+Build with Qt 3.3.5.
+@
+text
+@/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+#include "firmwareselector.h"
+#include "trace.h"
+#include "ipodicons.h"
+#include "combobox.h"
+
+#include <qlabel.h>
+#include <qfiledialog.h>
+#include <qlistbox.h>
+#include <qtabwidget.h>
+#include <qpushbutton.h>
+#include <qprocess.h>
+#include <qregexp.h>
+#include <qtimer.h>
+#include <qradiobutton.h>
+#include <qbuttongroup.h>
+#include <qspinbox.h>
+#include <qcheckbox.h>
+#include <qapplication.h>
+
+#if defined(Q_WS_MACX)
+#include <CoreServices/CoreServices.h>
+
+#include <sys/stat.h>
+#include <stdlib.h>
+#elif defined(Q_OS_LINUX)
+#include <mntent.h>
+#endif
+
+#define UPDATES_PATH "/Contents/Resources/Updates/"
+// from ipodedit.c (lets me detect a firmware)
+static const char FIRMWARE_HEADER_MAGIC[] = "{{~~  /-----\\   {{~~ /       \\  {{~~|         | {{~~| S T O P | {{~~|         | {{~~ \\       /  {{~~  \\-----/   Copyright(C) 2001 Apple Computer, Inc.---------------------------------------------------------------------------------------------------------\0]ih[";
+
+
+
+FirmwareSelector::FirmwareSelector( OperationType op, QWidget *parent, const char *name, bool modal )
+    : FirmwareSelectorBase( parent, name, modal ),
+    mOp( op )
+{
+    TRACE("FirmwareSelector::FirmwareSelector(%d)", mOp);
+    loadSession();
+
+    // Setup recent files combo
+    leFile->clear();
+    for ( QStringList::const_iterator it = session.recentFiles.begin(); it != session.recentFiles.end(); it++ ) {
+	QString file = QFileInfo(*it).fileName();
+	if ( file.length() > 30 )
+	    file = file.left(30) + "...";
+	qDebug( "inserting %s", file.local8Bit().data() );
+	leFile->insertItem( file );
+    }
+    leFile->setCurrentText( "" );
+
+    // setup the refresh timer
+    ipodRefreshTimer = new QTimer( this );
+    connect( ipodRefreshTimer, SIGNAL(timeout()), this, SLOT(slotRefreshIpods()) );
+
+    // setup extract spinbox
+    spinExtractLimit->setValue( session.extractLimit );
+
+    // eject pref
+    chkEject->setChecked( session.eject );
+
+    // this control is only for export
+    if ( mOp == Import ) {
+	chkEject->hide();
+	chkNewFirmware->hide();
+    }
+
+    // we need to hide them or they'll both be visible
+    grpIpod->setShown( false );
+    grpFile->setShown( false );
+#ifdef Q_WS_MACX
+    QRadioButton *btn = dynamic_cast<QRadioButton*>(grpButtons->find( session.defaultTab ));
+    if ( btn )
+	btn->setChecked( true );
+    slotTabChanged( session.defaultTab );
+#else
+    radioFile->setChecked( true );
+    radioIpod->setEnabled( 0 );
+    slotTabChanged( 1 );
+#endif
+
+    updateText();
+}
+
+FirmwareSelector::~FirmwareSelector()
+{
+    TRACE("FirmwareSelector::~FirmwareSelector()");
+    saveSession();
+}
+
+int FirmwareSelector::exec()
+{
+    TRACE("FirmwareSelector::exec()");
+    if ( QFileInfo(IpodIcons::dataDir() + "/firmware-fs").exists() ) {
+	bool rm = QDir(IpodIcons::dataDir()).remove("firmware-fs");
+	Q_ASSERT( rm );
+    }
+    int r = FirmwareSelectorBase::exec();
+    IpodIcons::getInstance()->removeDir( IpodIcons::dataDir() + "/" IPOD_FW );
+    return r;
+}
+
+void FirmwareSelector::updateText()
+{
+    TRACE("FirmwareSelector::updateText()");
+    QString import;
+    QString read;
+    QString from;
+    switch ( mOp ) {
+	case Import:
+	    import = tr("Import");
+	    read = tr("read");
+	    from = tr("from");
+	    break;
+	case Export:
+	    import = tr("Export");
+	    read = tr("write");
+	    from = tr("to");
+	    break;
+	default:
+	    qWarning( "Unknown operation %d", mOp );
+	    return;
+    }
+
+    setCaption( tr("%1 Firmware").arg(import) );
+
+#ifdef Q_WS_MACX
+    ipodDescription->setText( tr("<qt>Select an iPod from the list. "
+		                 "iPodIcons will %1 the firmware directly %2 the iPod. "
+				 "If you do not see your iPod in the list, ensure it is "
+				 "plugged in.")
+	                      .arg(read).arg(from) );
+    fileDescription->hide();
+#else
+    ipodDescription->setText( tr("<qt>This feature is currently for Mac OS X only.") );
+    fileDescription->setText( tr("<qt>Enter the path to the firmware device (eg. /dev/sda1) to %1 the "
+	                         "firmware directly %2 the iPod.")
+	                      .arg(read).arg(from) );
+#endif
+}
+
+void FirmwareSelector::slotSelectFile()
+{
+    TRACE("FirmwareSelector::slotSelectFile()");
+
+    // Pick a file
+    QString s;
+    if ( chkNewFirmware->isChecked() )
+	s = QFileDialog::getSaveFileName( session.startingDir[mOp], tr("All Files (*)"), this, 0, tr("Select a file") );
+    else
+	s = QFileDialog::getOpenFileName( session.startingDir[mOp], tr("All Files (*)"), this, 0, tr("Select a file") );
+    qDebug( "selected %s", s.local8Bit().data() );
+    if ( s.isEmpty() )
+	return;
+
+    session.startingDir[mOp] = QFileInfo(s).dirPath(true);
+
+    qDebug( "setting text to %s", s.local8Bit().data() );
+    QString prev = leFile->currentText();
+    if ( prev != s ) {
+        leFile->setCurrentText( s );
+    } else {
+        slotCheckFile();
+    }
+}
+
+void FirmwareSelector::slotRefreshIpods()
+{
+    TRACE("FirmwareSelector::slotRefreshIpods()");
+    // don't do anything if we've popped up the menu (I think)
+    if ( !ipodCombo->isBusy() ) {
+	previousIpod = ipodCombo->currentText();
+	ipodCombo->clear();
+	ipodMap.clear();
+
+	// system-dependant behaviour
+	sysRefreshIpods();
+
+#ifdef ENABLE_ZIGGY
+	QString label = "Ziggy Stardust";
+	qDebug( "label %s", label.local8Bit().data() );
+	ipodMap[label] = QStringList() << "/dev/ziggy" << IpodIcons::dataDir() + "/ziggy.hd";
+	ipodCombo->insertItem( label );
+	if ( ipodCombo->count() == 1 || label == previousIpod )
+	    ipodCombo->setCurrentItem( ipodCombo->count() - 1 );
+#endif
+
+	updateOk();
+    }
+    ipodRefreshTimer->start( session.ipodRefresh, true );
+}
+
+void FirmwareSelector::slotFirmwareClose( QListBoxItem * )
+{
+    TRACE("FirmwareSelector::slotFirmwareClose()");
+    accept();
+}
+
+void FirmwareSelector::slotFirmwareCurrent( QListBoxItem * )
+{
+    TRACE("FirmwareSelector::slotFirmwareCurrent()");
+    updateOk();
+}
+
+void FirmwareSelector::slotLeFile()
+{
+    TRACE("FirmwareSelector::slotLeFile(%s)", leFile->currentText().local8Bit().data());
+    qApp->processEvents();
+    QString s = leFile->currentText();
+    if ( s == previousFile ) {
+	qDebug( "file didn't change" );
+	return;
+    }
+    slotCheckFile();
+}
+
+void FirmwareSelector::slotCheckFile()
+{
+    TRACE("FirmwareSelector::slotCheckFile()");
+    QString s = leFile->currentText();
+
+    previousFile = s;
+    firmwareCombo->clear();
+
+    QFileInfo fi( s );
+    if ( !fi.exists() ) {
+	if ( mOp == Import || !chkNewFirmware->isChecked() ) {
+	    qDebug( "file doesn't exist" );
+	    return;
+	}
+    }
+
+    if ( fi.isDir() ) {
+	qDebug( "Updater bundle?" );
+	extractDir = s + UPDATES_PATH;
+	extractGlob = "Firmware-*";
+	slotExtractDone();
+    } else {
+	if ( isFirmware(s) || mOp == Export && chkNewFirmware->isChecked() ) {
+	    qDebug( "Firmware file?" );
+	    extractDir = QFileInfo(s).dirPath(true);
+	    extractGlob = QFileInfo(s).fileName();
+	    firmwareCombo->insertStringList( QStringList() << extractGlob );
+	    firmwareCombo->setCurrentItem( 0 );
+	    updateOk();
+	} else {
+	    qDebug( "Updater file?" );
+	    extractDir = IpodIcons::dataDir() + "/" IPOD_FW;
+	    extractGlob = "firmware-*";
+	    QStringList args;
+	    args << IpodIcons::pathPrefix() + "/ipodedit" << "x" << s;
+	    if ( session.extractLimit != 0 )
+		args << QString("%1").arg(session.extractLimit);
+	    IpodIcons::getInstance(this)->startProc( tr("Checking Firmware"), args, this, SLOT(slotExtractDone()), 0, 0, true );
+	}
+    }
+}
+
+void FirmwareSelector::slotIpodCurrent( int )
+{
+    TRACE("FirmwareSelector::slotIpodCurrent()");
+    updateOk();
+}
+
+void FirmwareSelector::saveSession()
+{
+    TRACE("FirmwareSelector::saveSession()");
+    Settings settings( "firmwareselector" );
+    for ( int i = 0; i < MaxOperationType; i++ ) {
+	settings.writeEntry( QString("startingDir%1").arg(i), session.startingDir[i] );
+    }
+    settings.writeEntry( "defaultTab", session.defaultTab );
+    QStringList list = settings.entryList( "" );
+    for ( QStringList::const_iterator it = list.begin(); it != list.end(); it++ ) {
+	QString entry = *it;
+	if ( entry.find("recentFile") == 0 )
+	    settings.removeEntry( entry );
+    }
+    int first = 0;
+    int recentFiles = IpodIcons::getInstance()->recentFiles();
+    if ( (int)session.recentFiles.count() > recentFiles )
+	first = session.recentFiles.count() - recentFiles;
+    for ( int i = first; i < (int)session.recentFiles.count(); i++ ) {
+	settings.writeEntry( QString("recentFile%1").arg(i - first), session.recentFiles[i] );
+    }
+    settings.writeEntry( "extractLimit", session.extractLimit );
+    settings.writeEntry( "ipodRefresh", session.ipodRefresh );
+    settings.writeEntry( "eject", session.eject );
+}
+
+void FirmwareSelector::loadSession()
+{
+    TRACE("FirmwareSelector::loadSession()");
+    Settings settings( "firmwareselector" );
+    for ( int i = 0; i < MaxOperationType; i++ ) {
+	session.startingDir[i] = settings.readEntry( QString("startingDir%1").arg(i) );
+    }
+    session.defaultTab = settings.readNumEntry( "defaultTab" );
+    session.recentFiles.clear();
+    int recentFiles = IpodIcons::getInstance()->recentFiles();
+    for ( int i = 0; i < recentFiles; i++ ) {
+	QString recentFile = settings.readEntry( QString("recentFile%1").arg(i) );
+	if ( !recentFile.isEmpty() )
+	    session.recentFiles.append( recentFile );
+    }
+    session.extractLimit = settings.readNumEntry( "extractLimit", 0 );
+    session.ipodRefresh = settings.readNumEntry( "ipodRefresh", 5000 );
+    session.eject = settings.readBoolEntry( "eject", false );
+}
+
+bool FirmwareSelector::isFirmware( const QString &file )
+{
+    TRACE("FirmwareSelector::isFirmware(%s)", file.local8Bit().data());
+    static int size = sizeof(FIRMWARE_HEADER_MAGIC);
+    char *buffer = new char[size];
+    QFile f( file );
+    f.open( IO_ReadOnly );
+    int actual = f.readBlock( buffer, size );
+    int cmp = qstrncmp( buffer, FIRMWARE_HEADER_MAGIC, size );
+    delete buffer;
+    return ( actual == size && cmp == 0 );
+}
+
+void FirmwareSelector::slotExtractDone()
+{ 
+    TRACE("FirmwareSelector::slotExtractDone()");
+    QDir d( extractDir );
+    firmwareCombo->insertStringList( d.entryList(extractGlob) );
+    firmwareCombo->setCurrentItem( 0 );
+    //updateOk();
+}
+
+void FirmwareSelector::restoreFirmware()
+{
+    TRACE("FirmwareSelector::restoreFirmware()");
+    if ( mOp != Export )
+	return;
+
+    switch ( int id = grpButtons->selectedId() ) {
+	case 0: // iPod
+	    {
+		QDir d;
+		d.mkdir( IpodIcons::dataDir() + "/" IPOD_FW );
+		IpodIcons::getInstance()->copyFile( IpodIcons::dataDir() + "/firmware", IpodIcons::dataDir() + "/" IPOD_FW "/firmware-0.bin" );
+
+		QStringList info = ipodMap[ipodCombo->currentText()];
+		diskutilStep = 1;
+		QStringList args;
+		args << "/usr/sbin/diskutil" << "unmount" << info[0];
+		IpodIcons::getInstance(this)->startProc( tr("Unmounting iPod"), args, this, SLOT(diskutilDone()), 0, 0, false, info[0].isEmpty() );
+	    }
+	    break;
+	case 1: // File
+	    {
+		QListBoxItem *item = firmwareCombo->item( firmwareCombo->currentItem() );
+		if ( extractDir == IpodIcons::dataDir() + "/" IPOD_FW ) {
+		    QDir d;
+		    d.mkdir( extractDir );
+		}
+		IpodIcons::getInstance()->copyFile( IpodIcons::dataDir() + "/firmware", extractDir + "/" + item->text() );
+		if ( extractDir == IpodIcons::dataDir() + "/" IPOD_FW ) {
+		    qDebug( "restoring to an updater" );
+		    QStringList args;
+		    args << IpodIcons::pathPrefix() + "/ipodedit" << "w" << previousFile << IPOD_FW;
+		    IpodIcons::getInstance(this)->startProc( tr("Writing Firmware"), args, this, SIGNAL(restoreDone()) );
+		} else {
+		    // done
+		    QTimer::singleShot( 0, this, SIGNAL(restoreDone()) );
+		}
+	    }
+	    break;
+	default:
+	    qWarning( "Unhandled index %d", id );
+	    break;
+    }
+}
+
+void FirmwareSelector::accept()
+{
+    TRACE("FirmwareSelector::accept()");
+    if ( QFileInfo(IpodIcons::dataDir() + "/firmware-fs").exists() ) {
+	FirmwareSelectorBase::accept();
+	return;
+    }
+
+    // update prefs
+    session.eject = chkEject->isChecked();
+
+    if ( btnOk->isEnabled() == false ) {
+	// bug?
+	return;
+    }
+
+    if ( grpButtons->selectedId() == 1 ) {
+	// don't duplicate entries
+	bool exists = false;
+	QString file = leFile->currentText();
+	qDebug( "file %s", file.local8Bit().data() );
+	for ( QStringList::const_iterator it = session.recentFiles.begin(); it != session.recentFiles.end(); it++ ) {
+	    if ( *it == file ) {
+		exists = true;
+		break;
+	    }
+	}
+	if ( !exists ) {
+	    qDebug( "adding %s", file.local8Bit().data() );
+	    session.recentFiles << file;
+	}
+    }
+    if ( ipodRefreshTimer->isActive() )
+	ipodRefreshTimer->stop();
+    saveFirmware();
+}
+
+void FirmwareSelector::slotTabChanged( int )
+{
+    TRACE("FirmwareSelector::slotTabChanged()");
+    session.defaultTab = grpButtons->selectedId();
+    updateOk();
+    if ( session.defaultTab == 0 ) {
+	ipodRefreshTimer->start( 0, true );
+    } else if ( ipodRefreshTimer->isActive() )
+	ipodRefreshTimer->stop();
+}
+
+void FirmwareSelector::updateOk()
+{
+    TRACE("FirmwareSelector::updateOk()");
+    qDebug( "tab %d", grpButtons->selectedId() );
+    switch ( grpButtons->selectedId() ) {
+	case 0:
+	    qDebug( "count %d current %d", ipodCombo->count(), ipodCombo->currentItem() );
+	    btnOk->setEnabled( ipodCombo->count() != 0 && ipodCombo->currentItem() != -1 );
+	    break;
+	case 1:
+	    qDebug( "count %d current %d", firmwareCombo->count(), firmwareCombo->currentItem() );
+	    btnOk->setEnabled( firmwareCombo->count() != 0 && firmwareCombo->currentItem() != -1 );
+	    break;
+	default:
+	    qWarning( "Unhandled index %d", grpButtons->selectedId() );
+	    break;
+    }
+}
+
+void FirmwareSelector::saveFirmware()
+{
+    switch ( grpButtons->selectedId() ) {
+	case 0:
+	    {
+		QStringList args;
+		args << IpodIcons::pathPrefix() + "/ipodedit" << "x" << ipodMap[ipodCombo->currentText()][1] << "1";
+		IpodIcons::getInstance(this)->startProc( tr("Reading Firmware"), args, this, SLOT(slotFirmwareReadDone()) );
+	    }
+	    break;
+	case 1:
+	    {
+		QListBoxItem *item = firmwareCombo->item( firmwareCombo->currentItem() );
+		IpodIcons::getInstance()->copyFile( extractDir + "/" + item->text(), IpodIcons::dataDir() + "/firmware-fs" );
+		QTimer::singleShot( 0, this, SLOT(accept()) );
+	    }
+	    break;
+	default:
+	    qWarning( "Unhandled index %d", grpButtons->selectedId() );
+	    break;
+    }
+}
+
+void FirmwareSelector::slotFirmwareReadDone()
+{
+    TRACE("FirmwareSelector::slotFirmwareReadDone()");
+    IpodIcons::getInstance()->copyFile( IpodIcons::dataDir() + "/" IPOD_FW + "/firmware-0.bin", IpodIcons::dataDir() + "/firmware-fs" );
+    accept();
+}
+
+void FirmwareSelector::slotFileCombo( int item )
+{
+    TRACE("FirmwareSelector::slotFileCombo(%d)", item);
+    //previousItem
+    qDebug( "setting combo text to %s", session.recentFiles[item].local8Bit().data() );
+    leFile->setCurrentText( session.recentFiles[item] );
+}
+
+void FirmwareSelector::slotExtractLimit( int limit )
+{
+    TRACE("FirmwareSelector::slotExtractLimit(%d)", limit);
+    session.extractLimit = limit;
+}
+
+void FirmwareSelector::diskutilDone()
+{
+    TRACE("FirmwareSelector::diskutilDone()");
+    QStringList info = ipodMap[ipodCombo->currentText()];
+    QStringList args;
+    switch ( diskutilStep++ ) {
+	case 1:
+	case 3: /* fall through */
+	    // If we try to execute processes now, we'll die because the process object is still alive.
+	    // If we let the event loop process, the process object will go away.
+	    QTimer::singleShot( 0, this, SLOT(diskutilDone()) );
+	    break;
+	case 2:
+	    args << IpodIcons::pathPrefix() + "/ipodedit" << "w" << info[1] << IPOD_FW << "1";
+	    IpodIcons::getInstance(this)->startProc( tr("Writing Firmware"), args, this, SLOT(diskutilDone()) );
+	    break;
+	case 4:
+	    args << "/usr/sbin/diskutil" << (session.eject?"eject":"mount") << info[0];
+	    IpodIcons::getInstance(this)->startProc( session.eject?tr("Ejecting iPod"):tr("Mounting iPod"), args,
+		    this, SIGNAL(restoreDone()), 0, 0, false, info[0].isEmpty() );
+	    break;
+	default:
+	    emit restoreDone();
+	    break;
+    }
+}
+
+QString FirmwareSelector::selectedFirmware()
+{
+    switch ( grpButtons->selectedId() ) {
+	case 0:
+	    return QString("%1 - %2").arg(ipodCombo->currentText()).arg(ipodMap[ipodCombo->currentText()][0]);
+	case 1:
+	    {
+		QListBoxItem *item = firmwareCombo->item( firmwareCombo->currentItem() );
+		return QString("%1 - %2").arg(QFileInfo(previousFile).fileName()).arg(item->text());
+	    }
+	default:
+	    qWarning( "Unhandled index %d", grpButtons->selectedId() );
+	    break;
+    }
+    return "";
+}
+
+@
+
+
+1.5
+log
+@use the Ui classes directly instead of via intermediate classes
+@
+text
+@d25 1
+a25 1
+#include <q3listbox.h>
+d28 1
+a28 1
+#include <q3process.h>
+d50 1
+a50 1
+// ====================================================================
+d53 1
+a53 1
+    : QDialog( parent, name, modal ),
+a56 1
+    setupUi( this );
+d116 1
+a116 1
+    int r = QDialog::exec();
+d177 6
+a182 2
+    leFile->setCurrentText( s );
+    slotCheckFile();
+d211 1
+a211 1
+void FirmwareSelector::slotFirmwareClose( Q3ListBoxItem * )
+d217 1
+a217 1
+void FirmwareSelector::slotFirmwareCurrent( Q3ListBoxItem * )
+d373 1
+a373 1
+		Q3ListBoxItem *item = firmwareCombo->item( firmwareCombo->currentItem() );
+d400 1
+a400 1
+	QDialog::accept();
+d475 1
+a475 1
+		Q3ListBoxItem *item = firmwareCombo->item( firmwareCombo->currentItem() );
+d541 1
+a541 1
+		Q3ListBoxItem *item = firmwareCombo->item( firmwareCombo->currentItem() );
+@
+
+
+1.4
+log
+@Quick Qt 4 port.
+This just gets everything to compile.
+I need to steal my "how to process Qt 4 libs" code to make the .app usable.
+@
+text
+@a49 11
+
+FirmwareSelectorBase::FirmwareSelectorBase( QWidget *parent, const char *name, bool modal )
+    : QDialog( parent, name, modal )
+{
+    setupUi( this );
+}
+
+FirmwareSelectorBase::~FirmwareSelectorBase()
+{
+}
+
+d53 1
+a53 1
+    : FirmwareSelectorBase( parent, name, modal ),
+d57 1
+d117 1
+a117 1
+    int r = FirmwareSelectorBase::exec();
+d397 1
+a397 1
+	FirmwareSelectorBase::accept();
+@
+
+
+1.3
+log
+@ipodicons 0.3.2
+@
+text
+@d25 1
+a25 1
+#include <qlistbox.h>
+d28 1
+a28 1
+#include <qprocess.h>
+d51 11
+d218 1
+a218 1
+void FirmwareSelector::slotFirmwareClose( QListBoxItem * )
+d224 1
+a224 1
+void FirmwareSelector::slotFirmwareCurrent( QListBoxItem * )
+d380 1
+a380 1
+		QListBoxItem *item = firmwareCombo->item( firmwareCombo->currentItem() );
+d482 1
+a482 1
+		QListBoxItem *item = firmwareCombo->item( firmwareCombo->currentItem() );
+d548 1
+a548 1
+		QListBoxItem *item = firmwareCombo->item( firmwareCombo->currentItem() );
+@
+
+
+1.2
+log
+@ipodicons 0.3.1
+@
+text
+@d165 5
+a169 1
+    QString s = QFileDialog::getOpenFileName( session.startingDir[mOp], tr("All Files (*)"), this, 0, tr("Select a file") );
+d196 1
+a196 1
+	ipodMap[label] = QStringList() << "" << IpodIcons::dataDir() + "/ziggy.hd";
+d528 17
+@
+
+
+1.1
+log
+@ipodicons 0.3.0
+@
+text
+@d21 1
+a24 1
+#include <qcombobox.h>
+d37 7
+a43 3
+#ifdef Q_WS_MACX
+#include <Security/Authorization.h>
+#include <Security/AuthorizationTags.h>
+d180 13
+a192 49
+
+    ipodRefreshData.clear();
+    QStringList args;
+    args << "mount";
+    IpodIcons::getInstance(this)->startProc( QString::null, args,
+	    this, SLOT(slotRefreshDone()), this, SLOT(slotRefreshData(QProcess*)) );
+}
+
+void FirmwareSelector::slotRefreshData( QProcess *proc )
+{
+    TRACE("FirmwareSelector::slotRefreshData()");
+    QString line;
+    while ( !(line = proc->readLineStdout()).isNull() ) {
+	qDebug( "mount: %s", line.local8Bit().data() );
+	ipodRefreshData << line;
+    }
+    while ( !(line = proc->readLineStderr()).isNull() )
+	qWarning( "mount: %s", line.local8Bit().data() );
+}
+
+void FirmwareSelector::slotRefreshDone()
+{
+    TRACE("FirmwareSelector::slotRefreshDone()");
+    QString previous = ipodCombo->currentText();
+    ipodCombo->clear();
+    ipodMap.clear();
+
+    QString line;
+    for ( QStringList::const_iterator it = ipodRefreshData.begin(); it != ipodRefreshData.end(); it++ ) {
+	line = *it;
+	QRegExp e( "^(.*) on (.*) \\(.*\\)$" );
+	if ( e.search( line ) != 0 )
+	    continue;
+	QString device = e.cap(1);
+	qDebug( "device %s", device.local8Bit().data() );
+	QString mountPoint = e.cap(2);
+	qDebug( "mountPoint %s", mountPoint.local8Bit().data() );
+	if ( !QFileInfo(mountPoint + "/iPod_Control").exists() )
+	    continue;
+	QRegExp d( "^(.*disk\\d+)s\\d+" );
+	if ( d.search(device) == -1 )
+	    continue;
+	QString firmwarePartition = d.cap(1);
+	qDebug( "firmwarePartition %s", firmwarePartition.local8Bit().data() );
+	if ( !QFileInfo(firmwarePartition).exists() )
+	    continue;
+
+	QString label = QFileInfo(mountPoint).fileName();
+	ipodMap[label] = QStringList() << device << firmwarePartition;
+d194 1
+a194 1
+	if ( ipodCombo->count() == 1 || label == previous )
+a195 9
+    }
+
+#ifdef TEST_IPOD
+    qDebug( "Adding test iPod" );
+    QString label = "Ziggy Stardust";
+    ipodMap[label] = QStringList() << "" << IpodIcons::dataDir() + "/ziggy.hd";
+    ipodCombo->insertItem( label );
+    if ( ipodCombo->count() == 1 || label == previous )
+	ipodCombo->setCurrentItem( ipodCombo->count() - 1 );
+d198 2
+a199 1
+    updateOk();
+@
+

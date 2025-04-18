@@ -1,0 +1,259 @@
+head	1.7;
+access;
+symbols
+	ipodicons-0_3_6:1.7
+	ipodicons-0_3_5:1.6
+	ipodicons-0_3_4:1.6
+	qt4_port:1.5.0.2
+	ipodicons-0_3_3:1.3
+	ipodicons-0_3_2:1.3
+	ipodicons-0_3_1:1.2
+	ipodicons-0_3_0:1.1;
+locks; strict;
+comment	@ * @;
+
+
+1.7
+date	2006.04.27.00.43.23;	author a1291762;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2005.09.14.02.35.46;	author a1291762;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2005.07.12.14.05.45;	author a1291762;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2005.07.08.14.19.05;	author a1291762;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.03.13.02.07.22;	author link;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.03.13.02.06.47;	author link;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.02.05.54;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.7
+log
+@use the mountpoint name for iPods that don't have an iTunesDevice file (eg. 5G)
+@
+text
+@/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+#ifndef FIRMWARESELECTOR_H
+#define FIRMWARESELECTOR_H
+
+#include "firmwareselectorbase.h"
+
+#include <qstring.h>
+#include <qmap.h>
+
+#define IPOD_DEVICE_FILE "/iPod_Control/iTunes/DeviceInfo"
+#define IPOD_ALT_DEVICE_FILE "/iPod_Control/iTunes/iTunesDB"
+
+class QProcess;
+class QTimer;
+class PrefsDialog;
+
+class FirmwareSelector : public FirmwareSelectorBase
+{
+    friend class PrefsDialog;
+
+    Q_OBJECT
+public:
+    enum OperationType { Import = 0, Export, MaxOperationType };
+
+    FirmwareSelector( OperationType op, QWidget *parent = 0, const char *name = 0, bool modal = false );
+    virtual ~FirmwareSelector();
+
+    int exec();
+    QString selectedFirmware();
+
+public slots:
+    void accept();
+    void restoreFirmware();
+
+signals:
+    void restoreDone();
+
+private slots:
+    void slotSelectFile();
+    void slotRefreshIpods();
+    void slotLeFile();
+    void slotCheckFile();
+    void slotTabChanged( int tab );
+    void slotFirmwareClose( QListBoxItem *item );
+    void slotFirmwareCurrent( QListBoxItem *item );
+    void slotIpodCurrent( int item );
+    void slotFileCombo( int item );
+    void slotExtractLimit( int limit );
+
+    void slotExtractDone();
+    void updateOk();
+    void slotFirmwareReadDone();
+    void diskutilDone();
+
+private:
+    void updateText();
+    void saveSession();
+    void loadSession();
+    bool isFirmware( const QString &file );
+    void saveFirmware();
+
+    void sysRefreshIpods();
+
+    OperationType mOp;
+    QString extractDir;
+    QString extractGlob;
+    QString previousFile;
+    QMap<QString,QStringList> ipodMap;
+    QTimer *ipodRefreshTimer;
+    int diskutilStep;
+    QString previousIpod;
+
+    struct Session
+    {
+	QString startingDir[FirmwareSelector::MaxOperationType];
+	int defaultTab;
+	QStringList recentFiles;
+	int extractLimit;
+	int ipodRefresh;
+	bool eject;
+    };
+    Session session;
+};
+
+#endif
+@
+
+
+1.6
+log
+@Throw away the Qt 4 work (the qt4_port branch can be used to continue it).
+Trying to manually sync to pre-qt4 state (might not be there).
+Build with Qt 3.3.5.
+@
+text
+@d27 1
+@
+
+
+1.5
+log
+@use the Ui classes directly instead of via intermediate classes
+@
+text
+@d21 1
+a21 1
+#include <ui_firmwareselectorbase.h>
+d28 1
+a28 1
+class Q3Process;
+d32 1
+a32 1
+class FirmwareSelector : public QDialog, public Ui_FirmwareSelectorBase
+d59 2
+a60 2
+    void slotFirmwareClose( Q3ListBoxItem *item );
+    void slotFirmwareCurrent( Q3ListBoxItem *item );
+@
+
+
+1.4
+log
+@Quick Qt 4 port.
+This just gets everything to compile.
+I need to steal my "how to process Qt 4 libs" code to make the .app usable.
+@
+text
+@d32 1
+a32 8
+class FirmwareSelectorBase : public QDialog, public Ui_FirmwareSelectorBase
+{
+public:
+    FirmwareSelectorBase( QWidget *parent = 0, const char *name = 0, bool modal = false );
+    ~FirmwareSelectorBase();
+};
+
+class FirmwareSelector : public FirmwareSelectorBase
+@
+
+
+1.3
+log
+@ipodicons 0.3.2
+@
+text
+@d21 1
+a21 1
+#include "firmwareselectorbase.h"
+d28 1
+a28 1
+class QProcess;
+d32 7
+d66 2
+a67 2
+    void slotFirmwareClose( QListBoxItem *item );
+    void slotFirmwareCurrent( QListBoxItem *item );
+@
+
+
+1.2
+log
+@ipodicons 0.3.1
+@
+text
+@d44 1
+@
+
+
+1.1
+log
+@ipodicons 0.3.0
+@
+text
+@d26 2
+a64 2
+    void slotRefreshData( QProcess *proc );
+    void slotRefreshDone();
+d76 2
+a83 1
+    QStringList ipodRefreshData;
+d85 1
+@
+

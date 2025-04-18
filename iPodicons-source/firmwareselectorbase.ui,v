@@ -1,0 +1,1257 @@
+head	1.4;
+access;
+symbols
+	ipodicons-0_3_6:1.4
+	ipodicons-0_3_5:1.4
+	ipodicons-0_3_4:1.4
+	qt4_port:1.3.0.2
+	ipodicons-0_3_3:1.2
+	ipodicons-0_3_2:1.2
+	ipodicons-0_3_1:1.2
+	ipodicons-0_3_0:1.1;
+locks; strict;
+comment	@# @;
+
+
+1.4
+date	2005.09.14.02.35.46;	author a1291762;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.07.08.14.19.05;	author a1291762;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.03.13.02.06.47;	author link;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.02.05.54;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.4
+log
+@Throw away the Qt 4 work (the qt4_port branch can be used to continue it).
+Trying to manually sync to pre-qt4 state (might not be there).
+Build with Qt 3.3.5.
+@
+text
+@<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>FirmwareSelectorBase</class>
+<comment>
+/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+</comment>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>FirmwareSelectorBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>377</width>
+            <height>431</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Form1</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QButtonGroup">
+            <property name="name">
+                <cstring>grpButtons</cstring>
+            </property>
+            <property name="frameShape">
+                <enum>NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Plain</enum>
+            </property>
+            <property name="title">
+                <string></string>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QRadioButton">
+                    <property name="name">
+                        <cstring>radioIpod</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Select an iPod</string>
+                    </property>
+                    <property name="buttonGroupId">
+                        <number>0</number>
+                    </property>
+                </widget>
+                <widget class="QFrame">
+                    <property name="name">
+                        <cstring>grpIpod</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Plain</enum>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="ComboBox">
+                            <property name="name">
+                                <cstring>ipodCombo</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QCheckBox">
+                            <property name="name">
+                                <cstring>chkEject</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Eject iPod after export</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>ipodDescription</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&lt;qt&gt;some dummy text designed to make the layout look ok in designer</string>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget class="QRadioButton">
+                    <property name="name">
+                        <cstring>radioFile</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Select a file</string>
+                    </property>
+                    <property name="buttonGroupId">
+                        <number>1</number>
+                    </property>
+                </widget>
+                <widget class="QFrame">
+                    <property name="name">
+                        <cstring>grpFile</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Plain</enum>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout8</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel1</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Limit search to the first</string>
+                                    </property>
+                                </widget>
+                                <widget class="QSpinBox">
+                                    <property name="name">
+                                        <cstring>spinExtractLimit</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel2</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>firmwares (0=all)</string>
+                                    </property>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>spacer4</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>Expanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>41</width>
+                                            <height>21</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </hbox>
+                        </widget>
+                        <widget class="QCheckBox">
+                            <property name="name">
+                                <cstring>chkNewFirmware</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Create new firmware file</string>
+                            </property>
+                            <property name="checked">
+                                <bool>false</bool>
+                            </property>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout15</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QComboBox">
+                                    <property name="name">
+                                        <cstring>leFile</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>3</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="editable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="insertionPolicy">
+                                        <enum>NoInsertion</enum>
+                                    </property>
+                                    <property name="autoCompletion">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="duplicatesEnabled">
+                                        <bool>false</bool>
+                                    </property>
+                                </widget>
+                                <widget class="QPushButton">
+                                    <property name="name">
+                                        <cstring>btnFile</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Browse</string>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>fileDescription</cstring>
+                            </property>
+                            <property name="backgroundMode">
+                                <enum>PaletteBackground</enum>
+                            </property>
+                            <property name="text">
+                                <string>&lt;qt&gt;some dummy text designed to make the layout look ok in designer</string>
+                            </property>
+                        </widget>
+                        <widget class="QListBox">
+                            <property name="name">
+                                <cstring>firmwareCombo</cstring>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+            </vbox>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout4</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer2</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>31</width>
+                            <height>21</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>btnCancel</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Cancel</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>btnOk</cstring>
+                    </property>
+                    <property name="text">
+                        <string>OK</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                    <property name="default">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </vbox>
+</widget>
+<customwidgets>
+    <customwidget>
+        <class>ComboBox</class>
+        <header location="local">combobox.h</header>
+        <sizehint>
+            <width>20</width>
+            <height>20</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>1</hordata>
+            <verdata>0</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image0</pixmap>
+        <signal>activated(int)</signal>
+    </customwidget>
+</customwidgets>
+<images>
+    <image name="image0">
+        <data format="PNG" length="1125">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000042c49444154789cb5954f6c14551cc73fefcd7476b65bdaae4bb78bb5502a14d404e4801c88182d1c4c2c693da847400f9c24c68b878684238660e2b1e01f12c19493012ef2478c814412d354a46017a8a564bb6da5bbedccee767776e63d0ffb073751d483bfe49799974c3eeffb7ebf37df9fd05a530b2184040cc0042420aaf9a4d0d554800f045a6b256ae0e1e1e1d6bebebe838ee31c48a7d39b5cd7fd075e251cc7617272f2ded8d8d819cff33e0316819259537aead4a9839d5dd6d1784f91f55b0a94830242088404d304292bef68a89f520802a598fecddaa04f1a876f5c250c7c0a64cdeac686e33807e23d45e6b297c8b877f1831542614550b6599835c83c2a81b6786a75134faf2f1169f12997350881d9021d0903e06de0745d3160a6d3e94dbd5b0a64dcbb94b5831d0e3375ab892b1772dcf9790528543f8dd0d367b36768153b5e31503a0f1aecb004580b44ffac58baae8b1714f0833c7638cc8dab303a320f4822ab4c7a37c69196203de3319d5ce1c4d13c733331dedc67a129a154fd128401ab0616d55a130ac3d42d93d1913940d13fd0c9ee0183685c60da01c5421bd72f7a8c8efccef9afd374267ad93d642365be0636a0d28ec7600941d9e6f23917f0e97f23ce5bef35d19ec863da0ed9059b2be70bec196c66dfa10ec0e49b338f7017258651bf95021035c595429bb0903248fe52a2b5b595dd7b4d945cc2340cdca536be389ee3f67886c5798f773fe8e0dac508c989659277a2180da4ca4ff07821058b8b251445d63d6b13ed1098a6417e39cac85197dbe31962ab9bd9f1f22a226d45366f6d0620fdb08c900d281af6110284b20085b414861d905d88f2e52739ee8cbb8022143259d3dd84691730aa2d52da441a8de0c6958068870022a41e9629ad3473fd3b8fdbe319dadb9b4924da994d2d716c7896fbe35152f78b48245d6b2da4507faf582be8eaf159b721cc837b05ae7debb1f79d08cb8b515edad942a22bc4b1c33eb3d34b1c797f06af90a72d16e2f96d9a74aa11dca8586b222d01af0fb60070f6c402d72f15d97f28c6f6d7027a5f5ce6c3233dc4e2ede496b278be4fff608cee8d3e1add806aeca51094cbb06397c1ecc328e746537c7e3ccdb5cb1136bf60635882d4d41c6ec6836ab37efa214f72208ed9f4d7cdd38ee310280542e38b1c43fb6de26b3672e1ec3cc99bcb246f66a938a3241ab3e91f7c861fbf77710b1e5e49915bae974203ba0e9e9c9cbc373d6d6d305a040a89c2a77f50b27d5782bbbf7acccf28349235dd16cf6dd374f7295e1de8a45c02d37499182b01cc0201a085d61a2144d8b2ac8fb6ed340e77240c4261890e04c250185262546d534a032154b59e0ad394e41c98182bf268ce6721ed9f064e0253356f6da2e24c1f030f783c15fe6da680af8021602bd051532ca9b8521488559f61aa86c29343578fbf0264a94c906c7d3409214c20043457a116ff6de6795578012889ff6b98fe016ea0ce1c203e47720000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>radioIpod</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>grpIpod</receiver>
+        <slot>setShown(bool)</slot>
+    </connection>
+    <connection>
+        <sender>btnFile</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>grpFile</receiver>
+        <slot>setShown(bool)</slot>
+    </connection>
+    <connection>
+        <sender>btnCancel</sender>
+        <signal>clicked()</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>btnOk</sender>
+        <signal>clicked()</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>btnFile</sender>
+        <signal>clicked()</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotSelectFile()</slot>
+    </connection>
+    <connection>
+        <sender>leFile</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotLeFile()</slot>
+    </connection>
+    <connection>
+        <sender>firmwareCombo</sender>
+        <signal>doubleClicked(QListBoxItem*)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotFirmwareClose(QListBoxItem*)</slot>
+    </connection>
+    <connection>
+        <sender>firmwareCombo</sender>
+        <signal>currentChanged(QListBoxItem*)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotFirmwareCurrent(QListBoxItem*)</slot>
+    </connection>
+    <connection>
+        <sender>radioFile</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>grpFile</receiver>
+        <slot>setShown(bool)</slot>
+    </connection>
+    <connection>
+        <sender>leFile</sender>
+        <signal>activated(int)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotFileCombo(int)</slot>
+    </connection>
+    <connection>
+        <sender>spinExtractLimit</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotExtractLimit(int)</slot>
+    </connection>
+    <connection>
+        <sender>grpButtons</sender>
+        <signal>clicked(int)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotTabChanged(int)</slot>
+    </connection>
+    <connection>
+        <sender>spinExtractLimit</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotCheckFile()</slot>
+    </connection>
+    <connection>
+        <sender>chkNewFirmware</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotCheckFile()</slot>
+    </connection>
+    <connection>
+        <sender>ipodCombo</sender>
+        <signal>activated(int)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotIpodCurrent(int)</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>slotSelectFile()</slot>
+    <slot>slotRefreshIpods()</slot>
+    <slot>slotFirmwareClose(QListBoxItem*)</slot>
+    <slot>slotCheckFile()</slot>
+    <slot>slotTabChanged(int)</slot>
+    <slot>slotFirmwareCurrent(QListBoxItem*)</slot>
+    <slot>slotIpodCurrent(int)</slot>
+    <slot>slotFileCombo(int)</slot>
+    <slot>slotExtractLimit(int)</slot>
+    <slot>slotLeFile()</slot>
+    <slot>slotIpodActive(const QString&amp;)</slot>
+</slots>
+<layoutdefaults spacing="6" margin="6"/>
+<includehints>
+    <includehint>combobox.h</includehint>
+</includehints>
+</UI>
+@
+
+
+1.3
+log
+@Quick Qt 4 port.
+This just gets everything to compile.
+I need to steal my "how to process Qt 4 libs" code to make the .app usable.
+@
+text
+@d1 4
+a4 3
+<ui version="4.0" stdsetdef="1" >
+  <author></author>
+  <comment>
+d20 1
+d22 3
+a24 10
+  <exportmacro></exportmacro>
+  <class>FirmwareSelectorBase</class>
+  <widget class="QDialog" name="FirmwareSelectorBase" >
+    <property name="geometry" >
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>377</width>
+        <height>431</height>
+      </rect>
+d26 7
+a32 2
+    <property name="windowTitle" >
+      <string>Form1</string>
+d34 29
+a62 17
+    <layout class="QVBoxLayout" >
+      <property name="margin" >
+        <number>0</number>
+      </property>
+      <property name="spacing" >
+        <number>0</number>
+      </property>
+      <item>
+        <widget class="Q3ButtonGroup" name="grpButtons" >
+          <property name="title" >
+            <string/>
+          </property>
+          <layout class="QVBoxLayout" >
+            <item>
+              <widget class="QRadioButton" name="radioIpod" >
+                <property name="text" >
+                  <string>Select an iPod</string>
+d64 131
+a194 60
+                <property name="buttonGroupId" >
+                  <number>0</number>
+                </property>
+              </widget>
+            </item>
+            <item>
+              <widget class="Q3Frame" name="grpIpod" >
+                <property name="frameShape" >
+                  <enum>NoFrame</enum>
+                </property>
+                <property name="frameShadow" >
+                  <enum>Plain</enum>
+                </property>
+                <layout class="QVBoxLayout" >
+                  <item>
+                    <widget class="ComboBox" name="ipodCombo" />
+                  </item>
+                  <item>
+                    <widget class="QCheckBox" name="chkEject" >
+                      <property name="text" >
+                        <string>Eject iPod after export</string>
+                      </property>
+                    </widget>
+                  </item>
+                  <item>
+                    <widget class="QLabel" name="ipodDescription" >
+                      <property name="text" >
+                        <string>&lt;qt>some dummy text designed to make the layout look ok in designer</string>
+                      </property>
+                    </widget>
+                  </item>
+                </layout>
+              </widget>
+            </item>
+            <item>
+              <widget class="QRadioButton" name="radioFile" >
+                <property name="text" >
+                  <string>Select a file</string>
+                </property>
+                <property name="buttonGroupId" >
+                  <number>1</number>
+                </property>
+              </widget>
+            </item>
+            <item>
+              <widget class="Q3Frame" name="grpFile" >
+                <property name="frameShape" >
+                  <enum>NoFrame</enum>
+                </property>
+                <property name="frameShadow" >
+                  <enum>Plain</enum>
+                </property>
+                <layout class="QVBoxLayout" >
+                  <item>
+                    <layout class="QHBoxLayout" >
+                      <item>
+                        <widget class="QLabel" name="textLabel1" >
+                          <property name="text" >
+                            <string>Limit search to the first</string>
+                          </property>
+d196 42
+a237 9
+                      </item>
+                      <item>
+                        <widget class="QSpinBox" name="spinExtractLimit" />
+                      </item>
+                      <item>
+                        <widget class="QLabel" name="textLabel2" >
+                          <property name="text" >
+                            <string>firmwares (0=all)</string>
+                          </property>
+d239 10
+a248 53
+                      </item>
+                      <item>
+                        <spacer name="spacer4" >
+                          <property name="sizeHint" >
+                            <size>
+                              <width>41</width>
+                              <height>21</height>
+                            </size>
+                          </property>
+                          <property name="sizeType" >
+                            <enum>Expanding</enum>
+                          </property>
+                          <property name="orientation" >
+                            <enum>Horizontal</enum>
+                          </property>
+                        </spacer>
+                      </item>
+                    </layout>
+                  </item>
+                  <item>
+                    <widget class="QCheckBox" name="chkNewFirmware" >
+                      <property name="text" >
+                        <string>Create new firmware file</string>
+                      </property>
+                      <property name="checked" >
+                        <bool>false</bool>
+                      </property>
+                    </widget>
+                  </item>
+                  <item>
+                    <layout class="QHBoxLayout" >
+                      <item>
+                        <widget class="QComboBox" name="leFile" >
+                          <property name="sizePolicy" >
+                            <sizepolicy>
+                              <hsizetype>3</hsizetype>
+                              <vsizetype>0</vsizetype>
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                            </sizepolicy>
+                          </property>
+                          <property name="editable" >
+                            <bool>true</bool>
+                          </property>
+                          <property name="insertPolicy" >
+                            <enum>QComboBox::NoInsert</enum>
+                          </property>
+                          <property name="autoCompletion" >
+                            <bool>true</bool>
+                          </property>
+                          <property name="duplicatesEnabled" >
+                            <bool>false</bool>
+                          </property>
+d250 4
+a253 6
+                      </item>
+                      <item>
+                        <widget class="QPushButton" name="btnFile" >
+                          <property name="text" >
+                            <string>Browse</string>
+                          </property>
+d255 55
+a309 17
+                      </item>
+                    </layout>
+                  </item>
+                  <item>
+                    <widget class="QLabel" name="fileDescription" >
+                      <property name="text" >
+                        <string>&lt;qt>some dummy text designed to make the layout look ok in designer</string>
+                      </property>
+                    </widget>
+                  </item>
+                  <item>
+                    <widget class="Q3ListBox" name="firmwareCombo" />
+                  </item>
+                </layout>
+              </widget>
+            </item>
+          </layout>
+d311 3
+a313 49
+      </item>
+      <item>
+        <layout class="QHBoxLayout" >
+          <item>
+            <spacer name="spacer2" >
+              <property name="sizeHint" >
+                <size>
+                  <width>31</width>
+                  <height>21</height>
+                </size>
+              </property>
+              <property name="sizeType" >
+                <enum>Expanding</enum>
+              </property>
+              <property name="orientation" >
+                <enum>Horizontal</enum>
+              </property>
+            </spacer>
+          </item>
+          <item>
+            <widget class="QPushButton" name="btnCancel" >
+              <property name="text" >
+                <string>Cancel</string>
+              </property>
+              <property name="autoDefault" >
+                <bool>false</bool>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QPushButton" name="btnOk" >
+              <property name="text" >
+                <string>OK</string>
+              </property>
+              <property name="autoDefault" >
+                <bool>false</bool>
+              </property>
+              <property name="default" >
+                <bool>true</bool>
+              </property>
+            </widget>
+          </item>
+        </layout>
+      </item>
+    </layout>
+  </widget>
+  <layoutdefault spacing="6" margin="6" />
+  <pixmapfunction></pixmapfunction>
+  <customwidgets>
+d315 15
+a329 13
+      <class>ComboBox</class>
+      <extends></extends>
+      <header location="local" >combobox.h</header>
+      <sizehint>
+        <width>20</width>
+        <height>20</height>
+      </sizehint>
+      <container>0</container>
+      <sizepolicy>
+        <hordata>1</hordata>
+        <verdata>0</verdata>
+      </sizepolicy>
+      <pixmap>image0</pixmap>
+d331 4
+a334 4
+  </customwidgets>
+  <images>
+    <image name="image0" >
+      <data format="PNG" length="1125" >89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000042c49444154789cb5954f6c14551cc73fefcd7476b65bdaae4bb78bb5502a14d404e4801c88182d1c4c2c693da847400f9c24c68b878684238660e2b1e01f12c19493012ef2478c814412d354a46017a8a564bb6da5bbedccee767776e63d0ffb073751d483bfe49799974c3eeffb7ebf37df9fd05a530b2184040cc0042420aaf9a4d0d554800f045a6b256ae0e1e1e1d6bebebe838ee31c48a7d39b5cd7fd075e251cc7617272f2ded8d8d819cff33e0316819259537aead4a9839d5dd6d1784f91f55b0a94830242088404d304292bef68a89f520802a598fecddaa04f1a876f5c250c7c0a64cdeac686e33807e23d45e6b297c8b877f1831542614550b6599835c83c2a81b6786a75134faf2f1169f12997350881d9021d0903e06de0745d3160a6d3e94dbd5b0a64dcbb94b5831d0e3375ab892b1772dcf9790528543f8dd0d367b36768153b5e31503a0f1aecb004580b44ffac58baae8b1714f0833c7638cc8dab303a320f4822ab4c7a37c69196203de3319d5ce1c4d13c733331dedc67a129a154fd128401ab0616d55a130ac3d42d93d1913940d13fd0c9ee0183685c60da01c5421bd72f7a8c8efccef9afd374267ad93d642365be0636a0d28ec7600941d9e6f23917f0e97f23ce5bef35d19ec863da0ed9059b2be70bec196c66dfa10ec0e49b338f7017258651bf95021035c595429bb0903248fe52a2b5b595dd7b4d945cc2340cdca536be389ee3f67886c5798f773fe8e0dac508c989659277a2180da4ca4ff07821058b8b251445d63d6b13ed1098a6417e39cac85197dbe31962ab9bd9f1f22a226d45366f6d0620fdb08c900d281af6110284b20085b414861d905d88f2e52739ee8cbb8022143259d3dd84691730aa2d52da441a8de0c6958068870022a41e9629ad3473fd3b8fdbe319dadb9b4924da994d2d716c7896fbe35152f78b48245d6b2da4507faf582be8eaf159b721cc837b05ae7debb1f79d08cb8b515edad942a22bc4b1c33eb3d34b1c797f06af90a72d16e2f96d9a74aa11dca8586b222d01af0fb60070f6c402d72f15d97f28c6f6d7027a5f5ce6c3233dc4e2ede496b278be4fff608cee8d3e1add806aeca51094cbb06397c1ecc328e746537c7e3ccdb5cb1136bf60635882d4d41c6ec6836ab37efa214f72208ed9f4d7cdd38ee310280542e38b1c43fb6de26b3672e1ec3cc99bcb246f66a938a3241ab3e91f7c861fbf77710b1e5e49915bae974203ba0e9e9c9cbc373d6d6d305a040a89c2a77f50b27d5782bbbf7acccf28349235dd16cf6dd374f7295e1de8a45c02d37499182b01cc0201a085d61a2144d8b2ac8fb6ed340e77240c4261890e04c250185262546d534a032154b59e0ad394e41c98182bf268ce6721ed9f064e0253356f6da2e24c1f030f783c15fe6da680af8021602bd051532ca9b8521488559f61aa86c29343578fbf0264a94c906c7d3409214c20043457a116ff6de6795578012889ff6b98fe016ea0ce1c203e47720000000049454e44ae426082</data>
+d336 111
+a446 2
+  </images>
+</ui>
+@
+
+
+1.2
+log
+@ipodicons 0.3.1
+@
+text
+@d1 3
+a3 4
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>FirmwareSelectorBase</class>
+<comment>
+/*
+a18 1
+ */
+d20 10
+a29 3
+<widget class="QDialog">
+    <property name="name">
+        <cstring>FirmwareSelectorBase</cstring>
+d31 2
+a32 7
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>377</width>
+            <height>431</height>
+        </rect>
+d34 69
+a102 29
+    <property name="caption">
+        <string>Form1</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QButtonGroup">
+            <property name="name">
+                <cstring>grpButtons</cstring>
+            </property>
+            <property name="frameShape">
+                <enum>NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Plain</enum>
+            </property>
+            <property name="title">
+                <string></string>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+d104 8
+a111 29
+                <widget class="QRadioButton">
+                    <property name="name">
+                        <cstring>radioIpod</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Select an iPod</string>
+                    </property>
+                    <property name="buttonGroupId">
+                        <number>0</number>
+                    </property>
+                </widget>
+                <widget class="QFrame">
+                    <property name="name">
+                        <cstring>grpIpod</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Plain</enum>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="ComboBox">
+                            <property name="name">
+                                <cstring>ipodCombo</cstring>
+                            </property>
+d113 9
+a121 7
+                        <widget class="QCheckBox">
+                            <property name="name">
+                                <cstring>chkEject</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Eject iPod after export</string>
+                            </property>
+d123 53
+a175 7
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>ipodDescription</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&lt;qt&gt;some dummy text designed to make the layout look ok in designer</string>
+                            </property>
+d177 6
+a182 74
+                    </vbox>
+                </widget>
+                <widget class="QRadioButton">
+                    <property name="name">
+                        <cstring>radioFile</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Select a file</string>
+                    </property>
+                    <property name="buttonGroupId">
+                        <number>1</number>
+                    </property>
+                </widget>
+                <widget class="QFrame">
+                    <property name="name">
+                        <cstring>grpFile</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Plain</enum>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout8</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel1</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Limit search to the first</string>
+                                    </property>
+                                </widget>
+                                <widget class="QSpinBox">
+                                    <property name="name">
+                                        <cstring>spinExtractLimit</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel2</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>firmwares (0=all)</string>
+                                    </property>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>spacer4</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>Expanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>41</width>
+                                            <height>21</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </hbox>
+d184 17
+a200 125
+                        <widget class="QCheckBox">
+                            <property name="name">
+                                <cstring>chkNewFirmware</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Create new firmware file</string>
+                            </property>
+                            <property name="checked">
+                                <bool>false</bool>
+                            </property>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout15</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QComboBox">
+                                    <property name="name">
+                                        <cstring>leFile</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>3</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="editable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="insertionPolicy">
+                                        <enum>NoInsertion</enum>
+                                    </property>
+                                    <property name="autoCompletion">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="duplicatesEnabled">
+                                        <bool>false</bool>
+                                    </property>
+                                </widget>
+                                <widget class="QPushButton">
+                                    <property name="name">
+                                        <cstring>btnFile</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Browse</string>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>fileDescription</cstring>
+                            </property>
+                            <property name="backgroundMode">
+                                <enum>PaletteBackground</enum>
+                            </property>
+                            <property name="text">
+                                <string>&lt;qt&gt;some dummy text designed to make the layout look ok in designer</string>
+                            </property>
+                        </widget>
+                        <widget class="QListBox">
+                            <property name="name">
+                                <cstring>firmwareCombo</cstring>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+            </vbox>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout4</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer2</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>31</width>
+                            <height>21</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>btnCancel</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Cancel</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>btnOk</cstring>
+                    </property>
+                    <property name="text">
+                        <string>OK</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                    <property name="default">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+            </hbox>
+d202 49
+a250 3
+    </vbox>
+</widget>
+<customwidgets>
+d252 13
+a264 15
+        <class>ComboBox</class>
+        <header location="local">combobox.h</header>
+        <sizehint>
+            <width>20</width>
+            <height>20</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>1</hordata>
+            <verdata>0</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image0</pixmap>
+        <signal>activated(int)</signal>
+d266 4
+a269 4
+</customwidgets>
+<images>
+    <image name="image0">
+        <data format="PNG" length="1125">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000042c49444154789cb5954f6c14551cc73fefcd7476b65bdaae4bb78bb5502a14d404e4801c88182d1c4c2c693da847400f9c24c68b878684238660e2b1e01f12c19493012ef2478c814412d354a46017a8a564bb6da5bbedccee767776e63d0ffb073751d483bfe49799974c3eeffb7ebf37df9fd05a530b2184040cc0042420aaf9a4d0d554800f045a6b256ae0e1e1e1d6bebebe838ee31c48a7d39b5cd7fd075e251cc7617272f2ded8d8d819cff33e0316819259537aead4a9839d5dd6d1784f91f55b0a94830242088404d304292bef68a89f520802a598fecddaa04f1a876f5c250c7c0a64cdeac686e33807e23d45e6b297c8b877f1831542614550b6599835c83c2a81b6786a75134faf2f1169f12997350881d9021d0903e06de0745d3160a6d3e94dbd5b0a64dcbb94b5831d0e3375ab892b1772dcf9790528543f8dd0d367b36768153b5e31503a0f1aecb004580b44ffac58baae8b1714f0833c7638cc8dab303a320f4822ab4c7a37c69196203de3319d5ce1c4d13c733331dedc67a129a154fd128401ab0616d55a130ac3d42d93d1913940d13fd0c9ee0183685c60da01c5421bd72f7a8c8efccef9afd374267ad93d642365be0636a0d28ec7600941d9e6f23917f0e97f23ce5bef35d19ec863da0ed9059b2be70bec196c66dfa10ec0e49b338f7017258651bf95021035c595429bb0903248fe52a2b5b595dd7b4d945cc2340cdca536be389ee3f67886c5798f773fe8e0dac508c989659277a2180da4ca4ff07821058b8b251445d63d6b13ed1098a6417e39cac85197dbe31962ab9bd9f1f22a226d45366f6d0620fdb08c900d281af6110284b20085b414861d905d88f2e52739ee8cbb8022143259d3dd84691730aa2d52da441a8de0c6958068870022a41e9629ad3473fd3b8fdbe319dadb9b4924da994d2d716c7896fbe35152f78b48245d6b2da4507faf582be8eaf159b721cc837b05ae7debb1f79d08cb8b515edad942a22bc4b1c33eb3d34b1c797f06af90a72d16e2f96d9a74aa11dca8586b222d01af0fb60070f6c402d72f15d97f28c6f6d7027a5f5ce6c3233dc4e2ede496b278be4fff608cee8d3e1add806aeca51094cbb06397c1ecc328e746537c7e3ccdb5cb1136bf60635882d4d41c6ec6836ab37efa214f72208ed9f4d7cdd38ee310280542e38b1c43fb6de26b3672e1ec3cc99bcb246f66a938a3241ab3e91f7c861fbf77710b1e5e49915bae974203ba0e9e9c9cbc373d6d6d305a040a89c2a77f50b27d5782bbbf7acccf28349235dd16cf6dd374f7295e1de8a45c02d37499182b01cc0201a085d61a2144d8b2ac8fb6ed340e77240c4261890e04c250185262546d534a032154b59e0ad394e41c98182bf268ce6721ed9f064e0253356f6da2e24c1f030f783c15fe6da680af8021602bd051532ca9b8521488559f61aa86c29343578fbf0264a94c906c7d3409214c20043457a116ff6de6795578012889ff6b98fe016ea0ce1c203e47720000000049454e44ae426082</data>
+d271 2
+a272 111
+</images>
+<connections>
+    <connection>
+        <sender>radioIpod</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>grpIpod</receiver>
+        <slot>setShown(bool)</slot>
+    </connection>
+    <connection>
+        <sender>btnFile</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>grpFile</receiver>
+        <slot>setShown(bool)</slot>
+    </connection>
+    <connection>
+        <sender>btnCancel</sender>
+        <signal>clicked()</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>btnOk</sender>
+        <signal>clicked()</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>btnFile</sender>
+        <signal>clicked()</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotSelectFile()</slot>
+    </connection>
+    <connection>
+        <sender>leFile</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotLeFile()</slot>
+    </connection>
+    <connection>
+        <sender>firmwareCombo</sender>
+        <signal>doubleClicked(QListBoxItem*)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotFirmwareClose(QListBoxItem*)</slot>
+    </connection>
+    <connection>
+        <sender>firmwareCombo</sender>
+        <signal>currentChanged(QListBoxItem*)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotFirmwareCurrent(QListBoxItem*)</slot>
+    </connection>
+    <connection>
+        <sender>radioFile</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>grpFile</receiver>
+        <slot>setShown(bool)</slot>
+    </connection>
+    <connection>
+        <sender>leFile</sender>
+        <signal>activated(int)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotFileCombo(int)</slot>
+    </connection>
+    <connection>
+        <sender>spinExtractLimit</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotExtractLimit(int)</slot>
+    </connection>
+    <connection>
+        <sender>grpButtons</sender>
+        <signal>clicked(int)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotTabChanged(int)</slot>
+    </connection>
+    <connection>
+        <sender>spinExtractLimit</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotCheckFile()</slot>
+    </connection>
+    <connection>
+        <sender>chkNewFirmware</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotCheckFile()</slot>
+    </connection>
+    <connection>
+        <sender>ipodCombo</sender>
+        <signal>activated(int)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotIpodCurrent(int)</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>slotSelectFile()</slot>
+    <slot>slotRefreshIpods()</slot>
+    <slot>slotFirmwareClose(QListBoxItem*)</slot>
+    <slot>slotCheckFile()</slot>
+    <slot>slotTabChanged(int)</slot>
+    <slot>slotFirmwareCurrent(QListBoxItem*)</slot>
+    <slot>slotIpodCurrent(int)</slot>
+    <slot>slotFileCombo(int)</slot>
+    <slot>slotExtractLimit(int)</slot>
+    <slot>slotLeFile()</slot>
+    <slot>slotIpodActive(const QString&amp;)</slot>
+</slots>
+<layoutdefaults spacing="6" margin="6"/>
+<includehints>
+    <includehint>combobox.h</includehint>
+</includehints>
+</UI>
+@
+
+
+1.1
+log
+@ipodicons 0.3.0
+@
+text
+@d30 2
+a31 2
+            <width>357</width>
+            <height>409</height>
+d89 1
+a89 1
+                        <widget class="QComboBox">
+d313 24
+a368 6
+        <sender>ipodCombo</sender>
+        <signal>activated(int)</signal>
+        <receiver>FirmwareSelectorBase</receiver>
+        <slot>slotIpodCurrent(int)</slot>
+    </connection>
+    <connection>
+d422 6
+d440 1
+d443 3
+@
+

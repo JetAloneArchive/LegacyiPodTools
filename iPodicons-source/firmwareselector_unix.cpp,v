@@ -1,0 +1,122 @@
+head	1.2;
+access;
+symbols
+	ipodicons-0_3_6:1.2
+	ipodicons-0_3_5:1.1
+	ipodicons-0_3_4:1.1
+	qt4_port:1.1.0.2
+	ipodicons-0_3_3:1.1
+	ipodicons-0_3_2:1.1
+	ipodicons-0_3_1:1.1;
+locks; strict;
+comment	@// @;
+
+
+1.2
+date	2006.04.27.00.43.23;	author a1291762;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.02.06.47;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@use the mountpoint name for iPods that don't have an iTunesDevice file (eg. 5G)
+@
+text
+@/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+#include "firmwareselector.h"
+#include "trace.h"
+#include "ipodicons.h"
+#include "combobox.h"
+
+#include <qstring.h>
+#include <qmemarray.h>
+#include <qfileinfo.h>
+#include <qregexp.h>
+#include <qtimer.h>
+
+#ifdef Q_OS_LINUX
+#include <mntent.h>
+#endif
+
+
+void FirmwareSelector::sysRefreshIpods()
+{
+#ifdef Q_OS_LINUX
+    struct mntent *me;
+    FILE *mntfp = setmntent( "/etc/mtab", "r" );
+    while ( mntfp && (me = getmntent( mntfp )) != 0 ) {
+	QString device = QString( me->mnt_fsname );
+	qDebug( "device %s", device.local8Bit().data() );
+	QString mountPoint = QString( me->mnt_dir );
+	qDebug( "mountPoint %s", mountPoint.local8Bit().data() );
+
+        bool reg_device = QFileInfo(mountPoint + IPOD_DEVICE_FILE).exists();
+        bool alt_device = QFileInfo(mountPoint + IPOD_ALT_DEVICE_FILE).exists();
+	if ( !reg_device && !alt_device )
+	    continue;
+	QRegExp d( "^(.*sd[a-z])\\d+" );
+	if ( d.search(device) == -1 )
+	    continue;
+	QString firmwarePartition = d.cap(1);
+	qDebug( "firmwarePartition %s", firmwarePartition.local8Bit().data() );
+	if ( !QFileInfo(firmwarePartition).exists() )
+	    continue;
+
+        QString label;
+        if ( reg_device )
+            label = IpodIcons::getInstance()->getText( mountPoint + IPOD_DEVICE_FILE );
+        else
+            label = QFileInfo(mountPoint).fileName();
+        qDebug( "label %s", label.local8Bit().data() );
+
+	ipodMap[label] = QStringList() << device << firmwarePartition;
+	ipodCombo->insertItem( label );
+	if ( ipodCombo->count() == 1 || label == previousIpod )
+	    ipodCombo->setCurrentItem( ipodCombo->count() - 1 );
+    }
+#endif
+}
+
+@
+
+
+1.1
+log
+@ipodicons 0.3.1
+@
+text
+@d45 3
+a47 1
+	if ( !QFileInfo(mountPoint + IPOD_DEVICE_FILE).exists() )
+d57 6
+a62 2
+	QString label = IpodIcons::getInstance()->getText( mountPoint + IPOD_DEVICE_FILE );
+	qDebug( "label %s", label.local8Bit().data() );
+@
+

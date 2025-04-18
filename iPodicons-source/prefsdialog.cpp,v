@@ -1,0 +1,239 @@
+head	1.5;
+access;
+symbols
+	ipodicons-0_3_6:1.5
+	ipodicons-0_3_5:1.5
+	ipodicons-0_3_4:1.5
+	qt4_port:1.4.0.2
+	ipodicons-0_3_3:1.2
+	ipodicons-0_3_2:1.2
+	ipodicons-0_3_1:1.2
+	ipodicons-0_3_0:1.1;
+locks; strict;
+comment	@// @;
+
+
+1.5
+date	2005.09.14.02.35.46;	author a1291762;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2005.07.12.14.05.45;	author a1291762;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.07.08.14.19.05;	author a1291762;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.03.13.02.06.47;	author link;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.02.05.54;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.5
+log
+@Throw away the Qt 4 work (the qt4_port branch can be used to continue it).
+Trying to manually sync to pre-qt4 state (might not be there).
+Build with Qt 3.3.5.
+@
+text
+@/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+#include "prefsdialog.h"
+#include "trace.h"
+#include "ipodicons.h"
+#include "iconbrowser.h"
+#include "firmwareselector.h"
+
+#include <qslider.h>
+#include <qlcdnumber.h>
+#include <qcheckbox.h>
+#include <qimage.h>
+#include <qcombobox.h>
+
+PrefsDialog::PrefsDialog( QWidget *parent, const char *name, bool modal )
+    : PrefsDialogBase( parent, name, modal )
+{
+    TRACE("PrefsDialog::PrefsDialog()");
+    IpodIcons *ipodicons = IpodIcons::getInstance();
+    numRecent->display( ipodicons->session.recentFiles );
+    slideRecent->setValue( ipodicons->session.recentFiles );
+    for ( QValueList<IconBrowser*>::const_iterator it = ipodicons->browsers.begin(); it != ipodicons->browsers.end(); it++ ) {
+	IconBrowser *ib = *it;
+	numThumb->display( ib->session.thumbSize );
+	slideThumb->setValue( ib->session.thumbSize );
+	chkThumb->setChecked( ib->session.thumbnails );
+	for ( int i = 0; i < (int)QImageIO::outputFormats().count(); i++ ) {
+	    QString str = QString( QImageIO::outputFormats().at(i) );
+	    comboOutFormat->insertItem(str);
+	    if ( str == ib->session.outFormat )
+		comboOutFormat->setCurrentItem( comboOutFormat->count() - 1 );
+	}
+	break;
+    }
+    FirmwareSelector *fs = new FirmwareSelector( FirmwareSelector::Import );
+    numRefresh->display( fs->session.ipodRefresh / 1000 );
+    slideRefresh->setValue( fs->session.ipodRefresh / 1000 );
+    delete fs;
+}
+
+PrefsDialog::~PrefsDialog()
+{
+    TRACE("PrefsDialog::~PrefsDialog()");
+}
+
+void PrefsDialog::accept()
+{
+    TRACE("PrefsDialog::accept()");
+    IpodIcons *ipodicons = IpodIcons::getInstance();
+    ipodicons->session.recentFiles = slideRecent->value();
+    for ( QValueList<IconBrowser*>::const_iterator it = ipodicons->browsers.begin(); it != ipodicons->browsers.end(); it++ ) {
+	IconBrowser *ib = *it;
+	ib->session.thumbSize = slideThumb->value();
+	ib->session.thumbnails = chkThumb->isChecked();
+	ib->session.outFormat = comboOutFormat->currentText();
+    }
+    FirmwareSelector *fs = new FirmwareSelector( FirmwareSelector::Import );
+    fs->session.ipodRefresh = slideRefresh->value() * 1000;
+    delete fs;
+
+    PrefsDialogBase::accept();
+}
+
+void PrefsDialog::slotClear()
+{
+    TRACE("PrefsDialog::slotClear()");
+    IpodIcons *ipodicons = IpodIcons::getInstance();
+    for ( QValueList<IconBrowser*>::const_iterator it = ipodicons->browsers.begin(); it != ipodicons->browsers.end(); it++ ) {
+	IconBrowser *ib = *it;
+	ib->session.recentFiles.clear();
+    }
+    FirmwareSelector *fs = new FirmwareSelector( FirmwareSelector::Import );
+    fs->session.recentFiles.clear();
+    delete fs;
+}
+
+@
+
+
+1.4
+log
+@use the Ui classes directly instead of via intermediate classes
+@
+text
+@a28 1
+#include <QImageWriter>
+d31 1
+a31 1
+    : QDialog( parent, name, modal )
+a33 1
+    setupUi( this );
+d37 1
+a37 1
+    for ( QList<IconBrowser*>::const_iterator it = ipodicons->browsers.begin(); it != ipodicons->browsers.end(); it++ ) {
+d42 2
+a43 2
+	for ( int i = 0; i < (int)QImageWriter::supportedImageFormats().count(); i++ ) {
+	    QString str = QString( QImageWriter::supportedImageFormats().at(i) );
+d66 1
+a66 1
+    for ( QList<IconBrowser*>::const_iterator it = ipodicons->browsers.begin(); it != ipodicons->browsers.end(); it++ ) {
+d76 1
+a76 1
+    QDialog::accept();
+d83 1
+a83 1
+    for ( QList<IconBrowser*>::const_iterator it = ipodicons->browsers.begin(); it != ipodicons->browsers.end(); it++ ) {
+@
+
+
+1.3
+log
+@Quick Qt 4 port.
+This just gets everything to compile.
+I need to steal my "how to process Qt 4 libs" code to make the .app usable.
+@
+text
+@d31 1
+a31 1
+PrefsDialogBase::PrefsDialogBase( QWidget *parent, const char *name, bool modal )
+d34 1
+a35 12
+}
+
+PrefsDialogBase::~PrefsDialogBase()
+{
+}
+
+// ====================================================================
+
+PrefsDialog::PrefsDialog( QWidget *parent, const char *name, bool modal )
+    : PrefsDialogBase( parent, name, modal )
+{
+    TRACE("PrefsDialog::PrefsDialog()");
+d78 1
+a78 1
+    PrefsDialogBase::accept();
+@
+
+
+1.2
+log
+@ipodicons 0.3.1
+@
+text
+@d29 13
+d50 1
+a50 1
+    for ( QValueList<IconBrowser*>::const_iterator it = ipodicons->browsers.begin(); it != ipodicons->browsers.end(); it++ ) {
+d55 2
+a56 2
+	for ( int i = 0; i < (int)QImageIO::outputFormats().count(); i++ ) {
+	    QString str = QString( QImageIO::outputFormats().at(i) );
+d79 1
+a79 1
+    for ( QValueList<IconBrowser*>::const_iterator it = ipodicons->browsers.begin(); it != ipodicons->browsers.end(); it++ ) {
+d96 1
+a96 1
+    for ( QValueList<IconBrowser*>::const_iterator it = ipodicons->browsers.begin(); it != ipodicons->browsers.end(); it++ ) {
+@
+
+
+1.1
+log
+@ipodicons 0.3.0
+@
+text
+@d27 2
+d42 6
+d70 1
+@
+

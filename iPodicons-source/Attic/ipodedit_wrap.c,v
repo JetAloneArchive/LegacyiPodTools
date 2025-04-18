@@ -1,0 +1,48 @@
+head	1.2;
+access;
+symbols
+	ipodicons-0_2_4:1.1
+	ipodicons-0_2_3:1.1
+	ipodicons-0_2_2:1.1
+	ipodicons-0_2_1:1.1;
+locks; strict;
+comment	@ * @;
+
+
+1.2
+date	2005.03.13.02.05.54;	author link;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.02.00.55;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@ipodicons 0.3.0
+@
+text
+@#define main ipodedit_main
+//#include "../util/ipodedit/ipodedit.c"
+int main( int argc, char **argv )
+{
+    return 0;
+}
+
+@
+
+
+1.1
+log
+@ipodicons 0.2.1
+@
+text
+@@
+

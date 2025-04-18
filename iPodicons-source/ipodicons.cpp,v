@@ -1,0 +1,761 @@
+head	1.7;
+access;
+symbols
+	ipodicons-0_3_6:1.7
+	ipodicons-0_3_5:1.7
+	ipodicons-0_3_4:1.7
+	qt4_port:1.5.0.2
+	ipodicons-0_3_3:1.3
+	ipodicons-0_3_2:1.2
+	ipodicons-0_3_1:1.2
+	ipodicons-0_3_0:1.1;
+locks; strict;
+comment	@// @;
+
+
+1.7
+date	2005.09.14.04.30.44;	author a1291762;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2005.09.14.02.35.46;	author a1291762;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2005.07.12.14.05.45;	author a1291762;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2005.07.08.14.19.05;	author a1291762;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.03.13.02.08.37;	author link;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.03.13.02.06.47;	author link;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.02.05.54;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.7
+log
+@this assertion is bogus. The file might not exist
+@
+text
+@/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+#include "ipodicons.h"
+#include "trace.h"
+#include "waitdialogbase.h"
+#include "appicon.h"
+#include "readme.h"
+#include "iconbrowser.h"
+
+#include <qprocess.h>
+#include <qfileinfo.h>
+#include <qmessagebox.h>
+#include <qapplication.h>
+#include <qtimer.h>
+#include <qhttp.h>
+#include <qpushbutton.h>
+#include <qlabel.h>
+#include <qvaluelist.h>
+
+#ifdef Q_WS_MACX
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
+#include <unistd.h>
+
+static IpodIcons *sInstance = 0;
+
+static int packDate( const QDate &nextCheck )
+{
+    qDebug( "year  %d %d", nextCheck.year(), (nextCheck.year() << 9) );
+    qDebug( "month %d %d", nextCheck.month(), (nextCheck.month() << 5) );
+    qDebug( "day   %d %d", nextCheck.day(), nextCheck.day() );
+    return (nextCheck.year() << 9) | (nextCheck.month() << 5) | nextCheck.day();
+}
+
+static QDate unpackDate( int theDate )
+{
+    QDate nextCheck = QDate::currentDate();
+    if ( theDate ) {
+	qDebug( "read %d", theDate );
+	qDebug( "year  %d", theDate >> 9 );
+	qDebug( "month %d", (theDate >> 5) & 0x0e );
+	qDebug( "day   %d", theDate & 0x1f );
+	nextCheck.setYMD( theDate >> 9, (theDate >> 5) & 0x0e, theDate & 0x1f );
+    }
+    return nextCheck;
+}
+
+// ====================================================================
+
+class WaitDialog : public WaitDialogBase
+{
+    Q_OBJECT
+public:
+    WaitDialog( const QString &message, const QString &cancel, QWidget *parent = 0, const char *name = 0, bool modal = FALSE )
+	: WaitDialogBase( parent, name, modal )
+    {
+	lblMessage->setText( message );
+	if ( cancel.isNull() ) {
+	    btnAbort->hide();
+	} else {
+	    btnAbort->setText( cancel );
+	    connect( btnAbort, SIGNAL(clicked()), this, SIGNAL(canceled()) );
+	}
+    }
+
+    virtual ~WaitDialog()
+    {
+    }
+
+signals:
+    void canceled();
+
+private:
+    void accept()
+    {   
+	reject();
+    }
+
+    void reject()
+    {
+	if ( btnAbort->isVisible() )
+	    emit canceled();
+    }
+};
+
+// ====================================================================
+
+Settings::Settings( const char *prefix )
+    : QSettings()
+{
+    //TRACE("Settings::Settings()");
+    insertSearchPath( QSettings::Unix, IpodIcons::dataDir() );
+    insertSearchPath( QSettings::Windows, "/iPodIcons" );
+#ifdef Q_WS_MACX
+    setPath( "ramsayl", "iPodIcons", User );
+#endif
+#if defined(Q_OS_UNIX) && !defined(Q_WS_MACX)
+    beginGroup( "iPodIcons" );
+#endif
+
+    if ( prefix )
+	beginGroup( prefix );
+}
+
+Settings::~Settings()
+{
+    //TRACE("Settings::~Settings()");
+}
+
+// ====================================================================
+
+Version::Version( const QString &version )
+{
+    //TRACE("Version::Version(%s)", version.local8Bit().data());
+    QStringList bits = QStringList::split( ".", version );
+    major = bits[0].toInt();
+    minor = bits[1].toInt();
+    release = bits[2].toInt();
+}
+
+Version::~Version()
+{
+    //TRACE("Version::~Version()");
+}
+
+bool Version::operator<=( const Version &other )
+{
+    TRACE("Version::operator<=()");
+    if ( major > other.major ||
+         ( major == other.major &&
+           ( minor > other.minor ||
+             ( minor == other.minor &&
+               ( release > other.release ) ) ) ) ) {
+        qDebug( "%d.%d.%d > %d.%d.%d", major, minor, release, other.major, other.minor, other.release );
+        return false;
+    }
+    qDebug( "%d.%d.%d <= %d.%d.%d", major, minor, release, other.major, other.minor, other.release );
+    return true;
+}
+
+bool Version::operator<( const Version &other )
+{
+    TRACE("Version::operator<()");
+    if ( major > other.major ||
+         ( major == other.major &&
+           ( minor > other.minor ||
+             ( minor == other.minor &&
+               ( release >= other.release ) ) ) ) ) {
+        qDebug( "%d.%d.%d >= %d.%d.%d", major, minor, release, other.major, other.minor, other.release );
+        return false;
+    }
+    qDebug( "%d.%d.%d < %d.%d.%d", major, minor, release, other.major, other.minor, other.release );
+    return true;
+}
+
+// ====================================================================
+
+IpodIcons::IpodIcons( QObject *parent )
+    : QObject( parent ),
+    ipodeditProc( 0 ),
+    mProgressDialog( 0 ),
+    parentWidget( 0 )
+{
+    TRACE("IpodIcons::IpodIcons()");
+    if ( !sInstance )
+	sInstance = this;
+
+    // The prefix lets us find ipodedit
+#ifdef Q_WS_MACX
+    // CFBundle will give us the full pathname to the Application's bundle
+    CFURLRef pluginRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+    CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef, kCFURLPOSIXPathStyle);
+    const char *pathPtr = CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding());
+    Q_ASSERT( pathPtr != NULL );
+    mPathPrefix = pathPtr;
+    mPathPrefix.append( "/Contents/Resources" );
+#else
+    mPathPrefix = qApp->applicationDirPath();
+#endif
+
+    // Setup the data dir
+#ifdef Q_WS_MACX
+    {
+        // Clean out the "old" location
+        mDataDir = QString("%1/.iPodIcons").arg(getenv("HOME"));
+        QDir homeDir( mDataDir );
+        if ( homeDir.exists() )
+            system(QString("rm -rf %1").arg(mDataDir).local8Bit().data());
+    }
+
+    mDataDir = QString("%1/Library/Application Support/iPodIcons").arg(getenv("HOME"));
+#else
+    mDataDir = QString("%1/.iPodIcons").arg(getenv("HOME"));
+#endif
+
+    QDir homeDir( mDataDir );
+    bool ok;
+    if ( !homeDir.exists() ) {
+        qDebug( "mkdir %s", mDataDir.local8Bit().data() );
+        ok = homeDir.mkdir( mDataDir );
+        Q_ASSERT( ok );
+    }
+    qDebug( "cd %s", mDataDir.local8Bit().data() );
+    ok = chdir( mDataDir.local8Bit() ) == 0;
+    if ( !ok ) {
+        QMessageBox::critical( qApp->mainWidget(), tr("Error!"), tr("<qt>Could not enter %s").arg(mDataDir), QMessageBox::Ok, 0, 0 );
+        ::exit( 1 );
+    }
+
+    loadSession();
+
+    // Load in our icon (it's compiled into the executable)
+    QByteArray b;
+    b.setRawData( appIconData, sizeof(appIconData) );
+    mIcon = QPixmap( b );
+    b.resetRawData( appIconData, sizeof(appIconData) );
+
+    // Clean out obsolete preference items
+    if ( session.version == "0.2.3" ) {
+        Settings settings;
+        // I can't believe I was storing file information in the app's settings!
+        QStringList keys = settings.subkeyList( "firmware/items" );
+        settings.beginGroup( "firmware/items" );
+        for ( QStringList::const_iterator kit = keys.begin(); kit != keys.end(); kit++ ) {
+            QStringList items = settings.entryList( *kit );
+            settings.beginGroup(*kit);
+            for ( QStringList::const_iterator iit = items.begin(); iit != items.end(); iit++ ) {
+                settings.removeEntry( *iit );
+            }
+            settings.endGroup();
+            settings.removeEntry( *kit );
+        }
+        settings.endGroup();
+        // these are now stored in firmwareselector and iconbrowser
+        settings.removeEntry( "startingDir" );
+        for ( int i = 0; i <= 3; i++ )
+            settings.removeEntry( QString("startingDir%1").arg(i) );
+        // this is now stored in iconbrowser
+        settings.removeEntry( "resourceIndex" );
+        // these are now stored in firmwareselector and iconbrowser
+        for ( int i = 0; i <= 4; i++ )
+            settings.removeEntry( QString("recentFile%1").arg(i) );
+        // these are not used anymore
+        settings.removeEntry( "file" );
+        settings.removeEntry( "glob" );
+        settings.removeEntry( "globIndex" );
+    }
+
+    // Check that ipodedit exists
+    if ( !QFileInfo( IpodIcons::pathPrefix() + "/ipodedit" ).exists() ) {
+        QMessageBox::critical( qApp->mainWidget(), tr("Missing Files!"), tr("<qt>You are missing ipodedit!"), QMessageBox::Ok, 0, 0 );
+        ::exit( 1 );
+        return;
+    }
+
+    Version over( session.version );
+    Version cver( VERSION );
+    if ( over < cver ) {
+	about();
+    }
+
+    // Check if this is the current version
+    int theDate = session.nextCheck;
+    if ( theDate != -1 ) {
+        QDate nextCheck = unpackDate( theDate );
+        if ( QDate::currentDate().daysTo( nextCheck ) <= 0 ) {
+            http = new QHttp("ipodicons.sourceforge.net", 80);
+            connect( http, SIGNAL(requestFinished(int,bool)), this, SLOT(httpDone(int,bool)) );
+            http->get( "/currentver" );
+        }
+    }
+}
+
+// this function isn't called...
+IpodIcons::~IpodIcons()
+{
+    TRACE("IpodIcons::~IpodIcons()");
+    if ( sInstance == this )
+	sInstance = 0;
+}
+
+IpodIcons *IpodIcons::getInstance( QWidget *parent )
+{
+    //TRACE("IpodIcons::getInstance(%x)", (int)parent);
+    if ( !sInstance )
+	new IpodIcons();
+    sInstance->parentWidget = parent;
+    return sInstance;
+}
+
+void IpodIcons::startProc( const QString &message, const QStringList &args,
+			   QObject *receiver, const char *slot,
+			   QObject *receiver2, const char *slot2,
+			   bool cancel, bool fake )
+{
+    TRACE("IpodIcons::startProc(%s, %s)", message.local8Bit().data(), args.join(", ").local8Bit().data());
+    if ( ipodeditProc != 0 ) {
+	Q_ASSERT( ipodeditProc == 0 );
+	return;
+    }
+
+    if ( fake ) {
+	QTimer::singleShot( 0, receiver, slot );
+	return;
+    }
+
+    if ( !message.isNull() ) {
+	// Popup a progress dialog
+	//qDebug( "parent %x", (int)parentWidget );
+	mProgressDialog = new WaitDialog( message, cancel?tr("Abort"):QString::null, parentWidget, 0, true );
+	if ( cancel )
+	    connect( mProgressDialog, SIGNAL(canceled()), this, SLOT(slotIpodeditCanceled()) );
+	mProgressDialog->show();
+    }
+
+    dataReceiver = receiver2;
+    dataSlot = slot2;
+    ipodeditProc = new QProcess( this );
+    ipodeditProc->setArguments( args );
+    connect( ipodeditProc, SIGNAL(processExited()), receiver, slot );
+    connect( ipodeditProc, SIGNAL(processExited()), this, SLOT(slotIpodeditDone()) );
+    connect( ipodeditProc, SIGNAL(readyReadStdout()), this, SLOT(slotIpodeditData()) );
+    connect( ipodeditProc, SIGNAL(readyReadStderr()), this, SLOT(slotIpodeditData()) );
+    ipodeditProc->start();
+}
+
+void IpodIcons::slotIpodeditData()
+{
+    TRACE("IpodIcons::slotIpodeditData()");
+    if ( dataReceiver ) {
+	connect( this, SIGNAL(dataReceived(QProcess*)), dataReceiver, dataSlot );
+	emit dataReceived( ipodeditProc );
+	disconnect( this, SIGNAL(dataReceived(QProcess*)), dataReceiver, dataSlot );
+    } else {
+	QString line;
+	while ( !(line = ipodeditProc->readLineStdout()).isNull() ) {
+	    qDebug( "ipodedit: %s", line.local8Bit().data() );
+	}
+	while ( !(line = ipodeditProc->readLineStderr()).isNull() )
+	    qWarning( "ipodedit: %s", line.local8Bit().data() );
+    }
+}
+
+void IpodIcons::slotIpodeditDone()
+{
+    TRACE("IpodIcons::slotIpodeditDone()");
+    if ( ipodeditProc )
+	ipodeditProc->deleteLater();
+    ipodeditProc = 0;
+    if ( mProgressDialog ) {
+	mProgressDialog->deleteLater();
+	mProgressDialog = 0;
+    }
+}
+
+void IpodIcons::slotIpodeditCanceled()
+{
+    TRACE("IpodIcons::slotIpodeditCanceled()");
+    if ( ipodeditProc ) {
+	ipodeditProc->tryTerminate();
+	QTimer::singleShot( 5000, ipodeditProc, SLOT(kill()) );
+    }
+}
+
+void IpodIcons::cleanupTempFiles()
+{
+    TRACE("IpodIcons::cleanupTempFiles()");
+#if 0
+    bool dialog = !mProgressDialog;
+    if ( dialog ) {
+	// Popup a progress dialog
+	mProgressDialog = new WaitDialog( tr("Cleaning Up"), QString::null, parentWidget, 0 );
+	mProgressDialog->show();
+    }
+#endif
+    static const char *directories[] = {
+	IPOD_DIR,
+	IPOD_RAW_DIR,
+	IPOD_FW,
+	0
+    };
+    for ( int i = 0; directories[i]; i++ ) {
+	removeDir( IpodIcons::dataDir() + "/" + directories[i] );
+    }
+    QDir d;
+    bool ok;
+    d.remove( IpodIcons::dataDir() + "/ipod-resources.txt", &ok );
+    //Q_ASSERT( ok );
+#if 0
+    if ( dialog ) {
+	delete mProgressDialog;
+	mProgressDialog = 0;
+    }
+#endif
+}
+
+void IpodIcons::removeDir( const QString &dir )
+{
+    TRACE("IpodIcons::removeDir(%s)", dir.local8Bit().data());
+    bool ok;
+    QDir ipodPics( dir );
+    if ( ipodPics.exists() ) {
+	QStringList files = ipodPics.entryList();
+	for ( QStringList::Iterator it = files.begin(); it != files.end(); it++ ) {
+	    if ( *it == "." || *it == ".." )
+		continue;
+	    ok = ipodPics.remove( *it );
+	    Q_ASSERT( ok );
+	}
+	ok = ipodPics.rmdir( dir );
+	//Q_ASSERT( ok );
+    }
+}
+
+void IpodIcons::copyFile( const QString &source, const QString &dest )
+{
+    TRACE("IpodIcons::copyFile(%s, %s)", source.local8Bit().data(), dest.local8Bit().data());
+    QFile in( source );
+    in.open( IO_ReadOnly );
+    QFile out( dest );
+    out.open( IO_WriteOnly );
+    out.writeBlock( in.readAll() );
+}
+
+void IpodIcons::httpDone( int /*id*/, bool error )
+{
+    TRACE("IpodIcons::httpDone(%d)", error);
+    int theDate = -1;
+    int days = 7;
+    do {
+	if ( error )
+	    break;
+	QString response = QString( http->readAll().data() ).stripWhiteSpace();
+	if ( response == VERSION )
+	    break;
+	Version nver( response );
+	Version cver( VERSION );
+	if ( nver <= cver )
+	    break;
+
+	switch ( QMessageBox::question( 0, tr("New Version Available"),
+					tr("<qt>A new version of iPodIcons is available (%1). "
+					   "Please visit <a href=\"http://ipodicons.sourceforge.net/\"> "
+					   "http://ipodicons.sourceforge.net/</a> to "
+					   "download the new version.<br>"
+					   "When do you want to be reminded again?").arg(response),
+					tr("Next Week"), tr("Next Month"), tr("Never"), 0, 0 ) ) {
+	    case 1:
+		days = 31;
+		break;
+	    case 2:
+		days = 0;
+		break;
+	    default:
+		break;
+	}
+    } while ( 0 );
+    if ( days )
+	theDate = packDate( QDate::currentDate().addDays(days) );
+    qDebug( "storing %d", theDate );
+    session.nextCheck = theDate;
+}
+
+void IpodIcons::saveSession()
+{
+    TRACE("IpodIcons::saveSession()");
+    Settings settings("ipodicons");;
+    settings.writeEntry( "version", VERSION );
+    settings.writeEntry( "nextCheck", session.nextCheck );
+    settings.writeEntry( "recentFiles", session.recentFiles );
+}
+
+void IpodIcons::loadSession()
+{
+    TRACE("IpodIcons::loadSession()");
+    Settings settings("ipodicons");;
+    session.version = settings.readEntry( "version", "0.2.3" );
+    session.nextCheck = settings.readNumEntry( "nextCheck", 0 );
+    session.recentFiles = settings.readNumEntry( "recentFiles", 5 );
+}
+
+QString IpodIcons::dataDir()
+{
+    return IpodIcons::getInstance(sInstance->parentWidget)->mDataDir;
+}
+
+QString IpodIcons::pathPrefix()
+{
+    return IpodIcons::getInstance(sInstance->parentWidget)->mPathPrefix;
+}
+
+void IpodIcons::registerBrowser( IconBrowser *ib )
+{
+    browsers.append( ib );
+    ib->setIcon( mIcon );
+}
+
+void IpodIcons::deregisterBrowser( IconBrowser *ib )
+{
+    browsers.remove( ib );
+}
+
+void IpodIcons::about()
+{
+    QMessageBox::about( parentWidget, tr("About iPodIcons"),
+               QString("<qt></b>%1").arg(readme_txt) );
+}
+
+void IpodIcons::shutdown()
+{
+    TRACE("IpodIcons::shutdown()");
+    saveSession();
+    QTimer::singleShot( 0, this, SLOT(deleteLater()) );
+}
+
+QString IpodIcons::getText( const QString &filename )
+{
+    TRACE("IpodIcons::getText(%s)", filename.local8Bit().data());
+    QFile file( filename );
+    bool ok = file.open( IO_ReadOnly );
+    Q_ASSERT( ok );
+    QTextStream stream( &file );
+    QString contents = stream.readLine();
+    qDebug( "contents %s", contents.local8Bit().data() );
+    return contents;
+}
+
+void IpodIcons::setText( const QString &filename, const QString &text )
+{
+    TRACE("IpodIcons::setText(%s,%s)", filename.local8Bit().data(), text.local8Bit().data());
+    QFile file( filename );
+    bool ok = file.open( IO_WriteOnly );
+    Q_ASSERT( ok );
+    QTextStream stream( &file );
+    stream << text;
+}
+
+#include "ipodicons.moc"
+@
+
+
+1.6
+log
+@Throw away the Qt 4 work (the qt4_port branch can be used to continue it).
+Trying to manually sync to pre-qt4 state (might not be there).
+Build with Qt 3.3.5.
+@
+text
+@d404 1
+a404 1
+    Q_ASSERT( ok );
+@
+
+
+1.5
+log
+@use the Ui classes directly instead of via intermediate classes
+@
+text
+@d20 1
+d25 1
+a25 3
+#include <ui_waitdialogbase.h>
+
+#include <q3process.h>
+d33 1
+a33 3
+#include <qlist.h>
+#include <QDate>
+#include <QDir>
+d66 1
+a66 1
+class WaitDialog : public QDialog, public Ui_WaitDialogBase
+d71 1
+a71 1
+	: QDialog( parent, name, modal )
+a72 1
+        setupUi( this );
+d334 1
+a334 1
+    ipodeditProc = new Q3Process( this );
+d347 1
+a347 1
+	connect( this, SIGNAL(dataReceived(Q3Process*)), dataReceiver, dataSlot );
+d349 1
+a349 1
+	disconnect( this, SIGNAL(dataReceived(Q3Process*)), dataReceiver, dataSlot );
+d402 2
+a403 1
+    bool ok = d.remove( IpodIcons::dataDir() + "/ipod-resources.txt" );
+@
+
+
+1.4
+log
+@Quick Qt 4 port.
+This just gets everything to compile.
+I need to steal my "how to process Qt 4 libs" code to make the .app usable.
+@
+text
+@d69 1
+a69 20
+class WaitDialogBase : public QDialog, public Ui_WaitDialogBase
+{
+public:
+    WaitDialogBase( QWidget *parent = 0, const char *name = 0, bool modal = false );
+    ~WaitDialogBase();
+};
+
+WaitDialogBase::WaitDialogBase( QWidget *parent, const char *name, bool modal )
+    : QDialog( parent, name, modal )
+{
+    setupUi( this );
+}
+
+WaitDialogBase::~WaitDialogBase()
+{
+}
+
+// ====================================================================
+
+class WaitDialog : public WaitDialogBase
+d74 1
+a74 1
+	: WaitDialogBase( parent, name, modal )
+d76 1
+@
+
+
+1.3
+log
+@ipodicons 0.3.3
+@
+text
+@a19 1
+#include "waitdialogbase.h"
+d24 3
+a26 1
+#include <qprocess.h>
+d34 3
+a36 1
+#include <qvaluelist.h>
+d69 19
+d356 1
+a356 1
+    ipodeditProc = new QProcess( this );
+d369 1
+a369 1
+	connect( this, SIGNAL(dataReceived(QProcess*)), dataReceiver, dataSlot );
+d371 1
+a371 1
+	disconnect( this, SIGNAL(dataReceived(QProcess*)), dataReceiver, dataSlot );
+d424 1
+a424 2
+    bool ok;
+    d.remove( IpodIcons::dataDir() + "/ipod-resources.txt", &ok );
+@
+
+
+1.2
+log
+@ipodicons 0.3.1
+@
+text
+@d39 2
+@
+
+
+1.1
+log
+@ipodicons 0.3.0
+@
+text
+@d33 1
+d55 1
+a55 1
+	qDebug( "month %d", (theDate >> 5) & 0x0d );
+d57 1
+a57 1
+	nextCheck.setYMD( theDate >> 9, (theDate >> 5) & 0x0d, theDate & 0x1f );
+a454 1
+	days = 7;
+d528 22
+@
+

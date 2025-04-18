@@ -1,0 +1,1007 @@
+head	1.4;
+access;
+symbols
+	ipodicons-0_3_6:1.4
+	ipodicons-0_3_5:1.4
+	ipodicons-0_3_4:1.4
+	qt4_port:1.3.0.2
+	ipodicons-0_3_3:1.2
+	ipodicons-0_3_2:1.2
+	ipodicons-0_3_1:1.2
+	ipodicons-0_3_0:1.1;
+locks; strict;
+comment	@# @;
+
+
+1.4
+date	2005.09.14.02.35.46;	author a1291762;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.07.08.14.19.05;	author a1291762;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.03.13.02.06.47;	author link;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.02.05.54;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.4
+log
+@Throw away the Qt 4 work (the qt4_port branch can be used to continue it).
+Trying to manually sync to pre-qt4 state (might not be there).
+Build with Qt 3.3.5.
+@
+text
+@<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PrefsDialogBase</class>
+<comment>
+/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+</comment>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PrefsDialogBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>433</width>
+            <height>181</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>iPodIcons Preferences</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout3</cstring>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel" row="1" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>textLabel4</cstring>
+                    </property>
+                    <property name="text">
+                        <string>iPod refresh interval (seconds)</string>
+                    </property>
+                </widget>
+                <widget class="QSlider" row="1" column="3">
+                    <property name="name">
+                        <cstring>slideRefresh</cstring>
+                    </property>
+                    <property name="minValue">
+                        <number>0</number>
+                    </property>
+                    <property name="maxValue">
+                        <number>60</number>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber" row="0" column="2">
+                    <property name="name">
+                        <cstring>numRecent</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="numDigits">
+                        <number>3</number>
+                    </property>
+                    <property name="segmentStyle">
+                        <enum>Flat</enum>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="0" column="1">
+                    <property name="name">
+                        <cstring>btnClear</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Clear</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>chkThumb</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Thumbnail size (pixels)</string>
+                    </property>
+                </widget>
+                <widget class="QSlider" row="0" column="3">
+                    <property name="name">
+                        <cstring>slideRecent</cstring>
+                    </property>
+                    <property name="maxValue">
+                        <number>20</number>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                </widget>
+                <widget class="QComboBox" row="3" column="3">
+                    <property name="name">
+                        <cstring>comboOutFormat</cstring>
+                    </property>
+                    <property name="insertionPolicy">
+                        <enum>NoInsertion</enum>
+                    </property>
+                    <property name="duplicatesEnabled">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="3" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>lblOutFormat</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Export File Format</string>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber" row="1" column="2">
+                    <property name="name">
+                        <cstring>numRefresh</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="numDigits">
+                        <number>3</number>
+                    </property>
+                    <property name="segmentStyle">
+                        <enum>Flat</enum>
+                    </property>
+                </widget>
+                <widget class="QSlider" row="2" column="3">
+                    <property name="name">
+                        <cstring>slideThumb</cstring>
+                    </property>
+                    <property name="minValue">
+                        <number>16</number>
+                    </property>
+                    <property name="maxValue">
+                        <number>128</number>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="0" column="0">
+                    <property name="name">
+                        <cstring>textLabel3</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Number of recent files</string>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber" row="2" column="2">
+                    <property name="name">
+                        <cstring>numThumb</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="numDigits">
+                        <number>3</number>
+                    </property>
+                    <property name="segmentStyle">
+                        <enum>Flat</enum>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout4</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer2</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>31</width>
+                            <height>21</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>btnCancel</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Cancel</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>btnOk</cstring>
+                    </property>
+                    <property name="text">
+                        <string>OK</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                    <property name="default">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </vbox>
+</widget>
+<connections>
+    <connection>
+        <sender>slideRecent</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>numRecent</receiver>
+        <slot>display(int)</slot>
+    </connection>
+    <connection>
+        <sender>slideRefresh</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>numRefresh</receiver>
+        <slot>display(int)</slot>
+    </connection>
+    <connection>
+        <sender>slideThumb</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>numThumb</receiver>
+        <slot>display(int)</slot>
+    </connection>
+    <connection>
+        <sender>btnOk</sender>
+        <signal>clicked()</signal>
+        <receiver>PrefsDialogBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>btnCancel</sender>
+        <signal>clicked()</signal>
+        <receiver>PrefsDialogBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>btnClear</sender>
+        <signal>clicked()</signal>
+        <receiver>PrefsDialogBase</receiver>
+        <slot>slotClear()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>slotClear()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="6"/>
+</UI>
+@
+
+
+1.3
+log
+@Quick Qt 4 port.
+This just gets everything to compile.
+I need to steal my "how to process Qt 4 libs" code to make the .app usable.
+@
+text
+@d1 4
+a4 3
+<ui version="4.0" stdsetdef="1" >
+  <author></author>
+  <comment>
+d20 1
+d22 3
+a24 10
+  <exportmacro></exportmacro>
+  <class>PrefsDialogBase</class>
+  <widget class="QDialog" name="PrefsDialogBase" >
+    <property name="geometry" >
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>433</width>
+        <height>181</height>
+      </rect>
+d26 7
+a32 2
+    <property name="windowTitle" >
+      <string>iPodIcons Preferences</string>
+d34 273
+a306 200
+    <layout class="QVBoxLayout" >
+      <item>
+        <layout class="QGridLayout" >
+          <item rowspan="1" row="1" column="0" colspan="2" >
+            <widget class="QLabel" name="textLabel4" >
+              <property name="text" >
+                <string>iPod refresh interval (seconds)</string>
+              </property>
+            </widget>
+          </item>
+          <item row="1" column="3" >
+            <widget class="QSlider" name="slideRefresh" >
+              <property name="minimum" >
+                <number>0</number>
+              </property>
+              <property name="maximum" >
+                <number>60</number>
+              </property>
+              <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+              </property>
+            </widget>
+          </item>
+          <item row="0" column="2" >
+            <widget class="QLCDNumber" name="numRecent" >
+              <property name="sizePolicy" >
+                <sizepolicy>
+                  <hsizetype>1</hsizetype>
+                  <vsizetype>0</vsizetype>
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                </sizepolicy>
+              </property>
+              <property name="frameShape" >
+                <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="numDigits" >
+                <number>3</number>
+              </property>
+              <property name="segmentStyle" >
+                <enum>QLCDNumber::Flat</enum>
+              </property>
+            </widget>
+          </item>
+          <item row="0" column="1" >
+            <widget class="QPushButton" name="btnClear" >
+              <property name="text" >
+                <string>Clear</string>
+              </property>
+              <property name="autoDefault" >
+                <bool>false</bool>
+              </property>
+            </widget>
+          </item>
+          <item rowspan="1" row="2" column="0" colspan="2" >
+            <widget class="QCheckBox" name="chkThumb" >
+              <property name="text" >
+                <string>Thumbnail size (pixels)</string>
+              </property>
+            </widget>
+          </item>
+          <item row="0" column="3" >
+            <widget class="QSlider" name="slideRecent" >
+              <property name="maximum" >
+                <number>20</number>
+              </property>
+              <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+              </property>
+            </widget>
+          </item>
+          <item row="3" column="3" >
+            <widget class="QComboBox" name="comboOutFormat" >
+              <property name="insertPolicy" >
+                <enum>QComboBox::NoInsert</enum>
+              </property>
+              <property name="duplicatesEnabled" >
+                <bool>false</bool>
+              </property>
+            </widget>
+          </item>
+          <item rowspan="1" row="3" column="0" colspan="2" >
+            <widget class="QLabel" name="lblOutFormat" >
+              <property name="text" >
+                <string>Export File Format</string>
+              </property>
+            </widget>
+          </item>
+          <item row="1" column="2" >
+            <widget class="QLCDNumber" name="numRefresh" >
+              <property name="sizePolicy" >
+                <sizepolicy>
+                  <hsizetype>1</hsizetype>
+                  <vsizetype>0</vsizetype>
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                </sizepolicy>
+              </property>
+              <property name="frameShape" >
+                <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="numDigits" >
+                <number>3</number>
+              </property>
+              <property name="segmentStyle" >
+                <enum>QLCDNumber::Flat</enum>
+              </property>
+            </widget>
+          </item>
+          <item row="2" column="3" >
+            <widget class="QSlider" name="slideThumb" >
+              <property name="minimum" >
+                <number>16</number>
+              </property>
+              <property name="maximum" >
+                <number>128</number>
+              </property>
+              <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+              </property>
+            </widget>
+          </item>
+          <item row="0" column="0" >
+            <widget class="QLabel" name="textLabel3" >
+              <property name="text" >
+                <string>Number of recent files</string>
+              </property>
+            </widget>
+          </item>
+          <item row="2" column="2" >
+            <widget class="QLCDNumber" name="numThumb" >
+              <property name="sizePolicy" >
+                <sizepolicy>
+                  <hsizetype>1</hsizetype>
+                  <vsizetype>0</vsizetype>
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                </sizepolicy>
+              </property>
+              <property name="frameShape" >
+                <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="numDigits" >
+                <number>3</number>
+              </property>
+              <property name="segmentStyle" >
+                <enum>QLCDNumber::Flat</enum>
+              </property>
+            </widget>
+          </item>
+        </layout>
+      </item>
+      <item>
+        <layout class="QHBoxLayout" >
+          <item>
+            <spacer name="spacer2" >
+              <property name="sizeHint" >
+                <size>
+                  <width>31</width>
+                  <height>21</height>
+                </size>
+              </property>
+              <property name="sizeType" >
+                <enum>Expanding</enum>
+              </property>
+              <property name="orientation" >
+                <enum>Horizontal</enum>
+              </property>
+            </spacer>
+          </item>
+          <item>
+            <widget class="QPushButton" name="btnCancel" >
+              <property name="text" >
+                <string>Cancel</string>
+              </property>
+              <property name="autoDefault" >
+                <bool>false</bool>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QPushButton" name="btnOk" >
+              <property name="text" >
+                <string>OK</string>
+              </property>
+              <property name="autoDefault" >
+                <bool>false</bool>
+              </property>
+              <property name="default" >
+                <bool>true</bool>
+              </property>
+            </widget>
+          </item>
+        </layout>
+      </item>
+    </layout>
+  </widget>
+  <layoutdefault spacing="6" margin="6" />
+  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+</ui>
+@
+
+
+1.2
+log
+@ipodicons 0.3.1
+@
+text
+@d1 3
+a3 4
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>PrefsDialogBase</class>
+<comment>
+/*
+a18 1
+ */
+d20 10
+a29 3
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PrefsDialogBase</cstring>
+d31 2
+a32 7
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>433</width>
+            <height>181</height>
+        </rect>
+d34 200
+a233 273
+    <property name="caption">
+        <string>iPodIcons Preferences</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout3</cstring>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel" row="1" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>textLabel4</cstring>
+                    </property>
+                    <property name="text">
+                        <string>iPod refresh interval (seconds)</string>
+                    </property>
+                </widget>
+                <widget class="QSlider" row="1" column="3">
+                    <property name="name">
+                        <cstring>slideRefresh</cstring>
+                    </property>
+                    <property name="minValue">
+                        <number>0</number>
+                    </property>
+                    <property name="maxValue">
+                        <number>60</number>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber" row="0" column="2">
+                    <property name="name">
+                        <cstring>numRecent</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="numDigits">
+                        <number>3</number>
+                    </property>
+                    <property name="segmentStyle">
+                        <enum>Flat</enum>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="0" column="1">
+                    <property name="name">
+                        <cstring>btnClear</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Clear</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>chkThumb</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Thumbnail size (pixels)</string>
+                    </property>
+                </widget>
+                <widget class="QSlider" row="0" column="3">
+                    <property name="name">
+                        <cstring>slideRecent</cstring>
+                    </property>
+                    <property name="maxValue">
+                        <number>20</number>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                </widget>
+                <widget class="QComboBox" row="3" column="3">
+                    <property name="name">
+                        <cstring>comboOutFormat</cstring>
+                    </property>
+                    <property name="insertionPolicy">
+                        <enum>NoInsertion</enum>
+                    </property>
+                    <property name="duplicatesEnabled">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="3" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>lblOutFormat</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Export File Format</string>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber" row="1" column="2">
+                    <property name="name">
+                        <cstring>numRefresh</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="numDigits">
+                        <number>3</number>
+                    </property>
+                    <property name="segmentStyle">
+                        <enum>Flat</enum>
+                    </property>
+                </widget>
+                <widget class="QSlider" row="2" column="3">
+                    <property name="name">
+                        <cstring>slideThumb</cstring>
+                    </property>
+                    <property name="minValue">
+                        <number>16</number>
+                    </property>
+                    <property name="maxValue">
+                        <number>128</number>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="0" column="0">
+                    <property name="name">
+                        <cstring>textLabel3</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Number of recent files</string>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber" row="2" column="2">
+                    <property name="name">
+                        <cstring>numThumb</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="numDigits">
+                        <number>3</number>
+                    </property>
+                    <property name="segmentStyle">
+                        <enum>Flat</enum>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout4</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer2</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>31</width>
+                            <height>21</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>btnCancel</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Cancel</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>btnOk</cstring>
+                    </property>
+                    <property name="text">
+                        <string>OK</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                    <property name="default">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </vbox>
+</widget>
+<connections>
+    <connection>
+        <sender>slideRecent</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>numRecent</receiver>
+        <slot>display(int)</slot>
+    </connection>
+    <connection>
+        <sender>slideRefresh</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>numRefresh</receiver>
+        <slot>display(int)</slot>
+    </connection>
+    <connection>
+        <sender>slideThumb</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>numThumb</receiver>
+        <slot>display(int)</slot>
+    </connection>
+    <connection>
+        <sender>btnOk</sender>
+        <signal>clicked()</signal>
+        <receiver>PrefsDialogBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>btnCancel</sender>
+        <signal>clicked()</signal>
+        <receiver>PrefsDialogBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>btnClear</sender>
+        <signal>clicked()</signal>
+        <receiver>PrefsDialogBase</receiver>
+        <slot>slotClear()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>slotClear()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="6"/>
+</UI>
+@
+
+
+1.1
+log
+@ipodicons 0.3.0
+@
+text
+@d30 2
+a31 2
+            <width>435</width>
+            <height>154</height>
+d43 1
+a43 1
+                <cstring>layout16</cstring>
+d49 1
+a49 1
+                <widget class="QPushButton" row="0" column="1">
+d51 1
+a51 1
+                        <cstring>btnClear</cstring>
+d54 12
+a65 1
+                        <string>Clear</string>
+d67 2
+a68 2
+                    <property name="autoDefault">
+                        <bool>false</bool>
+d71 1
+a71 1
+                <widget class="QLCDNumber" row="2" column="2">
+d73 1
+a73 1
+                        <cstring>numThumb</cstring>
+d93 1
+a93 1
+                <widget class="QLCDNumber" row="1" column="2">
+d95 1
+a95 1
+                        <cstring>numRefresh</cstring>
+d97 2
+a98 7
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+d100 2
+a101 2
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+d103 4
+a106 2
+                    <property name="numDigits">
+                        <number>3</number>
+d108 2
+a109 2
+                    <property name="segmentStyle">
+                        <enum>Flat</enum>
+d123 1
+a123 1
+                <widget class="QSlider" row="1" column="3">
+d125 4
+a128 1
+                        <cstring>slideRefresh</cstring>
+d130 2
+a131 2
+                    <property name="minValue">
+                        <number>0</number>
+d133 4
+a136 2
+                    <property name="maxValue">
+                        <number>60</number>
+d138 2
+a139 2
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+d142 1
+a142 1
+                <widget class="QLabel" row="1" column="0" rowspan="1" colspan="2">
+d144 15
+a158 1
+                        <cstring>textLabel4</cstring>
+d160 2
+a161 2
+                    <property name="text">
+                        <string>iPod refresh interval (seconds)</string>
+d178 1
+a178 1
+                <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
+d180 1
+a180 1
+                        <cstring>chkThumb</cstring>
+d183 1
+a183 1
+                        <string>Thumbnail size (pixels)</string>
+d186 1
+a186 1
+                <widget class="QLCDNumber" row="0" column="2">
+d188 1
+a188 1
+                        <cstring>numRecent</cstring>
+a205 8
+                    </property>
+                </widget>
+                <widget class="QLabel" row="0" column="0">
+                    <property name="name">
+                        <cstring>textLabel3</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Number of recent files</string>
+@
+

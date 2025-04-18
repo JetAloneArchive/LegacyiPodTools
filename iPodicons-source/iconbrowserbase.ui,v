@@ -1,0 +1,1852 @@
+head	1.9;
+access;
+symbols
+	ipodicons-0_3_6:1.9
+	ipodicons-0_3_5:1.9
+	ipodicons-0_3_4:1.9
+	qt4_port:1.8.0.2
+	ipodicons-0_3_3:1.7
+	ipodicons-0_3_2:1.7
+	ipodicons-0_3_1:1.7
+	ipodicons-0_3_0:1.6
+	ipodicons-0_2_4:1.5
+	ipodicons-0_2_3:1.4
+	ipodicons-0_2_2:1.3
+	ipodicons-0_2_1:1.3
+	ipodicons-0_2_0:1.3
+	ipodicons-0_1_3:1.2
+	ipodicons-0_1_2:1.2
+	ipodicons-0_1_1:1.1.1.1
+	release:1.1.1.1
+	vendor:1.1.1;
+locks; strict;
+comment	@# @;
+
+
+1.9
+date	2005.09.14.02.35.46;	author a1291762;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2005.07.08.14.19.05;	author a1291762;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2005.03.13.02.06.47;	author link;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2005.03.13.02.05.54;	author link;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2005.03.13.02.03.39;	author link;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2005.03.13.02.02.39;	author link;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.03.13.02.00.01;	author link;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.03.13.01.50.30;	author link;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.01.47.44;	author link;	state Exp;
+branches
+	1.1.1.1;
+next	;
+
+1.1.1.1
+date	2005.03.13.01.47.44;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.9
+log
+@Throw away the Qt 4 work (the qt4_port branch can be used to continue it).
+Trying to manually sync to pre-qt4 state (might not be there).
+Build with Qt 3.3.5.
+@
+text
+@<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>IconBrowserBase</class>
+<comment>
+/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+</comment>
+<widget class="QMainWindow">
+    <property name="name">
+        <cstring>IconBrowserBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>624</width>
+            <height>485</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>iPodIcons</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout3</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QFrame">
+                    <property name="name">
+                        <cstring>frame4</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Raised</enum>
+                    </property>
+                    <property name="lineWidth">
+                        <number>0</number>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
+                        <property name="spacing">
+                            <number>0</number>
+                        </property>
+                        <widget class="QButtonGroup">
+                            <property name="name">
+                                <cstring>firmwareCombo</cstring>
+                            </property>
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
+                            </property>
+                            <property name="lineWidth">
+                                <number>0</number>
+                            </property>
+                            <property name="title">
+                                <string></string>
+                            </property>
+                            <property name="flat">
+                                <bool>false</bool>
+                            </property>
+                            <property name="exclusive">
+                                <bool>true</bool>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QToolButton">
+                                    <property name="name">
+                                        <cstring>toolButton2</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Icons</string>
+                                    </property>
+                                    <property name="toggleButton">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="buttonGroupId">
+                                        <number>0</number>
+                                    </property>
+                                </widget>
+                                <widget class="QToolButton">
+                                    <property name="name">
+                                        <cstring>toolButton1</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Text</string>
+                                    </property>
+                                    <property name="toggleButton">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="buttonGroupId">
+                                        <number>1</number>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                    </hbox>
+                </widget>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer1</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>60</width>
+                            <height>20</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QLineEdit">
+                    <property name="name">
+                        <cstring>leSearch</cstring>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QIconView">
+            <property name="name">
+                <cstring>mIcons</cstring>
+            </property>
+            <property name="acceptDrops">
+                <bool>false</bool>
+            </property>
+            <property name="hScrollBarMode">
+                <enum>AlwaysOff</enum>
+            </property>
+            <property name="selectionMode">
+                <enum>Extended</enum>
+            </property>
+            <property name="resizeMode">
+                <enum>Adjust</enum>
+            </property>
+        </widget>
+    </vbox>
+</widget>
+<menubar>
+    <property name="name">
+        <cstring>MenuBarEditor</cstring>
+    </property>
+    <property name="backgroundOrigin">
+        <enum>AncestorOrigin</enum>
+    </property>
+    <item text="&amp;File" name="File">
+        <action name="actionFileImport"/>
+        <action name="actionFileExport"/>
+        <action name="actionFileClose"/>
+        <separator/>
+        <action name="actionFileQuit"/>
+    </item>
+    <item text="&amp;Edit" name="Edit">
+        <action name="actionEditImportItem"/>
+        <action name="actionEditExportItem"/>
+        <separator/>
+        <action name="actionEditPreferences"/>
+    </item>
+    <item text="&amp;Help" name="Help">
+        <action name="actionHelpAbout"/>
+        <action name="actionHelpAboutQt"/>
+    </item>
+</menubar>
+<toolbars>
+</toolbars>
+<actions>
+    <action>
+        <property name="name">
+            <cstring>actionFileClose</cstring>
+        </property>
+        <property name="text">
+            <string>Close</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Close</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+W</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionFileQuit</cstring>
+        </property>
+        <property name="text">
+            <string>Quit</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Quit</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+Q</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionHelpAbout</cstring>
+        </property>
+        <property name="text">
+            <string>About iPodIcons</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;About iPodIcons</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionFileSaveAs</cstring>
+        </property>
+        <property name="text">
+            <string>Save As</string>
+        </property>
+        <property name="menuText">
+            <string>Save &amp;As</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+Shift+S</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionEditImportItem</cstring>
+        </property>
+        <property name="text">
+            <string>Import Icon</string>
+        </property>
+        <property name="menuText">
+            <string>Import Icon</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionEditExportItem</cstring>
+        </property>
+        <property name="text">
+            <string>Export Icon</string>
+        </property>
+        <property name="menuText">
+            <string>Export Icon</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionFileOpen</cstring>
+        </property>
+        <property name="text">
+            <string>Open</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Open</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionFileSave</cstring>
+        </property>
+        <property name="text">
+            <string>Save</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Save</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionEditPreferences</cstring>
+        </property>
+        <property name="text">
+            <string>Preferences</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Preferences</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+;</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionFileImport</cstring>
+        </property>
+        <property name="text">
+            <string>Import Firmware</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Import Firmware</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+O</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionFileExport</cstring>
+        </property>
+        <property name="text">
+            <string>Export Firmware</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Export Firmware</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+S</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionHelpAboutQt</cstring>
+        </property>
+        <property name="text">
+            <string>About Qt</string>
+        </property>
+        <property name="menuText">
+            <string>About &amp;Qt</string>
+        </property>
+    </action>
+</actions>
+<connections>
+    <connection>
+        <sender>actionFileClose</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFileClose()</slot>
+    </connection>
+    <connection>
+        <sender>actionFileExport</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFileExport()</slot>
+    </connection>
+    <connection>
+        <sender>actionFileImport</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFileImport()</slot>
+    </connection>
+    <connection>
+        <sender>actionFileOpen</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFileOpen()</slot>
+    </connection>
+    <connection>
+        <sender>actionFileQuit</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFileQuit()</slot>
+    </connection>
+    <connection>
+        <sender>actionHelpAbout</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotHelpAbout()</slot>
+    </connection>
+    <connection>
+        <sender>actionEditExportItem</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotEditExportItem()</slot>
+    </connection>
+    <connection>
+        <sender>actionEditImportItem</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotEditImportItem()</slot>
+    </connection>
+    <connection>
+        <sender>actionEditPreferences</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotEditPreferences()</slot>
+    </connection>
+    <connection>
+        <sender>mIcons</sender>
+        <signal>contextMenuRequested(QIconViewItem*,const QPoint&amp;)</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotIconMenu(QIconViewItem*,const QPoint&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>mIcons</sender>
+        <signal>currentChanged(QIconViewItem*)</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotNewCurrentItem(QIconViewItem*)</slot>
+    </connection>
+    <connection>
+        <sender>actionHelpAboutQt</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotHelpAboutQt()</slot>
+    </connection>
+    <connection>
+        <sender>leSearch</sender>
+        <signal>returnPressed()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotSearch()</slot>
+    </connection>
+    <connection>
+        <sender>firmwareCombo</sender>
+        <signal>clicked(int)</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFirmwareCombo(int)</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>mIcons</tabstop>
+</tabstops>
+<slots>
+    <slot>slotFileClose()</slot>
+    <slot>slotFirmwareCombo(int)</slot>
+    <slot>slotIconMenu(QIconViewItem*,const QPoint&amp;)</slot>
+    <slot>slotEditImportItem()</slot>
+    <slot>slotEditExportItem()</slot>
+    <slot>slotFileExport()</slot>
+    <slot>slotFileImport()</slot>
+    <slot>slotEditPreferences()</slot>
+    <slot>slotFileOpen()</slot>
+    <slot>slotFileQuit()</slot>
+    <slot>slotHelpAbout()</slot>
+    <slot>slotFileSave()</slot>
+    <slot>slotFileSaveAs()</slot>
+    <slot>slotNewCurrentItem(QIconViewItem*)</slot>
+    <slot>slotHelpAboutQt()</slot>
+    <slot>slotSearch()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="6"/>
+</UI>
+@
+
+
+1.8
+log
+@Quick Qt 4 port.
+This just gets everything to compile.
+I need to steal my "how to process Qt 4 libs" code to make the .app usable.
+@
+text
+@d1 4
+a4 3
+<ui version="4.0" stdsetdef="1" >
+  <author></author>
+  <comment>
+d20 1
+d22 3
+a24 10
+  <exportmacro></exportmacro>
+  <class>IconBrowserBase</class>
+  <widget class="Q3MainWindow" name="IconBrowserBase" >
+    <property name="geometry" >
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>624</width>
+        <height>485</height>
+      </rect>
+d26 7
+a32 2
+    <property name="windowTitle" >
+      <string>iPodIcons</string>
+d34 14
+a47 8
+    <widget class="QWidget" >
+      <layout class="QVBoxLayout" >
+        <item>
+          <layout class="QHBoxLayout" >
+            <item>
+              <widget class="Q3Frame" name="frame4" >
+                <property name="frameShape" >
+                  <enum>NoFrame</enum>
+d49 22
+a70 27
+                <property name="frameShadow" >
+                  <enum>Raised</enum>
+                </property>
+                <property name="lineWidth" >
+                  <number>0</number>
+                </property>
+                <layout class="QHBoxLayout" >
+                  <property name="margin" >
+                    <number>0</number>
+                  </property>
+                  <property name="spacing" >
+                    <number>0</number>
+                  </property>
+                  <item>
+                    <widget class="Q3ButtonGroup" name="firmwareCombo" >
+                      <property name="title" >
+                        <string/>
+                      </property>
+                      <property name="flat" >
+                        <bool>false</bool>
+                      </property>
+                      <property name="exclusive" >
+                        <bool>true</bool>
+                      </property>
+                      <layout class="QHBoxLayout" >
+                        <property name="margin" >
+                          <number>0</number>
+d72 3
+a74 4
+                        <item>
+                          <widget class="QToolButton" name="toolButton2" >
+                            <property name="text" >
+                              <string>Icons</string>
+d76 2
+a77 2
+                            <property name="checkable" >
+                              <bool>true</bool>
+d79 2
+a80 2
+                            <property name="buttonGroupId" >
+                              <number>0</number>
+d82 2
+a83 6
+                          </widget>
+                        </item>
+                        <item>
+                          <widget class="QToolButton" name="toolButton1" >
+                            <property name="text" >
+                              <string>Text</string>
+d85 2
+a86 2
+                            <property name="checkable" >
+                              <bool>true</bool>
+d88 2
+a89 2
+                            <property name="buttonGroupId" >
+                              <number>1</number>
+d91 69
+a159 33
+                          </widget>
+                        </item>
+                      </layout>
+                    </widget>
+                  </item>
+                </layout>
+              </widget>
+            </item>
+            <item>
+              <spacer name="spacer1" >
+                <property name="sizeHint" >
+                  <size>
+                    <width>60</width>
+                    <height>20</height>
+                  </size>
+                </property>
+                <property name="sizeType" >
+                  <enum>Expanding</enum>
+                </property>
+                <property name="orientation" >
+                  <enum>Horizontal</enum>
+                </property>
+              </spacer>
+            </item>
+            <item>
+              <widget class="QLineEdit" name="leSearch" />
+            </item>
+          </layout>
+        </item>
+        <item>
+          <widget class="Q3IconView" name="mIcons" >
+            <property name="acceptDrops" >
+              <bool>false</bool>
+d161 2
+a162 2
+            <property name="hScrollBarMode" >
+              <enum>AlwaysOff</enum>
+d164 2
+a165 2
+            <property name="selectionMode" >
+              <enum>Extended</enum>
+d167 2
+a168 2
+            <property name="resizeMode" >
+              <enum>Adjust</enum>
+d170 272
+a441 192
+          </widget>
+        </item>
+      </layout>
+    </widget>
+    <widget class="QMenuBar" name="MenuBarEditor" >
+      <widget class="QMenu" name="File" >
+        <property name="title" >
+          <string>&amp;File</string>
+        </property>
+        <addaction name="actionFileImport" />
+        <addaction name="actionFileExport" />
+        <addaction name="actionFileClose" />
+        <addaction name="separator" />
+        <addaction name="actionFileQuit" />
+      </widget>
+      <widget class="QMenu" name="Edit" >
+        <property name="title" >
+          <string>&amp;Edit</string>
+        </property>
+        <addaction name="actionEditImportItem" />
+        <addaction name="actionEditExportItem" />
+        <addaction name="separator" />
+        <addaction name="actionEditPreferences" />
+      </widget>
+      <widget class="QMenu" name="Help" >
+        <property name="title" >
+          <string>&amp;Help</string>
+        </property>
+        <addaction name="actionHelpAbout" />
+        <addaction name="actionHelpAboutQt" />
+      </widget>
+      <addaction name="File" />
+      <addaction name="Edit" />
+      <addaction name="Help" />
+    </widget>
+    <action name="actionFileClose" >
+      <property name="name" >
+        <cstring>actionFileClose</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Close</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Close</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+W</string>
+      </property>
+    </action>
+    <action name="actionFileQuit" >
+      <property name="name" >
+        <cstring>actionFileQuit</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Quit</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Quit</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+Q</string>
+      </property>
+    </action>
+    <action name="actionHelpAbout" >
+      <property name="name" >
+        <cstring>actionHelpAbout</cstring>
+      </property>
+      <property name="iconText" >
+        <string>About iPodIcons</string>
+      </property>
+      <property name="text" >
+        <string>&amp;About iPodIcons</string>
+      </property>
+      <property name="shortcut" >
+        <string/>
+      </property>
+    </action>
+    <action name="actionFileSaveAs" >
+      <property name="name" >
+        <cstring>actionFileSaveAs</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Save As</string>
+      </property>
+      <property name="text" >
+        <string>Save &amp;As</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+Shift+S</string>
+      </property>
+    </action>
+    <action name="actionEditImportItem" >
+      <property name="name" >
+        <cstring>actionEditImportItem</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Import Icon</string>
+      </property>
+      <property name="text" >
+        <string>Import Icon</string>
+      </property>
+    </action>
+    <action name="actionEditExportItem" >
+      <property name="name" >
+        <cstring>actionEditExportItem</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Export Icon</string>
+      </property>
+      <property name="text" >
+        <string>Export Icon</string>
+      </property>
+    </action>
+    <action name="actionFileOpen" >
+      <property name="name" >
+        <cstring>actionFileOpen</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Open</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Open</string>
+      </property>
+    </action>
+    <action name="actionFileSave" >
+      <property name="name" >
+        <cstring>actionFileSave</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Save</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Save</string>
+      </property>
+    </action>
+    <action name="actionEditPreferences" >
+      <property name="name" >
+        <cstring>actionEditPreferences</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Preferences</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Preferences</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+;</string>
+      </property>
+    </action>
+    <action name="actionFileImport" >
+      <property name="name" >
+        <cstring>actionFileImport</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Import Firmware</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Import Firmware</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+O</string>
+      </property>
+    </action>
+    <action name="actionFileExport" >
+      <property name="name" >
+        <cstring>actionFileExport</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Export Firmware</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Export Firmware</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+S</string>
+      </property>
+    </action>
+    <action name="actionHelpAboutQt" >
+      <property name="name" >
+        <cstring>actionHelpAboutQt</cstring>
+      </property>
+      <property name="iconText" >
+        <string>About Qt</string>
+      </property>
+      <property name="text" >
+        <string>About &amp;Qt</string>
+      </property>
+    </action>
+  </widget>
+  <layoutdefault spacing="6" margin="6" />
+  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+  <tabstops>
+d443 21
+a463 2
+  </tabstops>
+</ui>
+@
+
+
+1.7
+log
+@ipodicons 0.3.1
+@
+text
+@d1 3
+a3 4
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>IconBrowserBase</class>
+<comment>
+/*
+a18 1
+ */
+d20 10
+a29 3
+<widget class="QMainWindow">
+    <property name="name">
+        <cstring>IconBrowserBase</cstring>
+d31 2
+a32 7
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>624</width>
+            <height>485</height>
+        </rect>
+d34 14
+a47 14
+    <property name="caption">
+        <string>iPodIcons</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout3</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+d49 21
+a69 16
+                <widget class="QFrame">
+                    <property name="name">
+                        <cstring>frame4</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Raised</enum>
+                    </property>
+                    <property name="lineWidth">
+                        <number>0</number>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+d71 4
+a74 9
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
+                        <property name="spacing">
+                            <number>0</number>
+                        </property>
+                        <widget class="QButtonGroup">
+                            <property name="name">
+                                <cstring>firmwareCombo</cstring>
+d76 2
+a77 2
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
+d79 2
+a80 2
+                            <property name="lineWidth">
+                                <number>0</number>
+d82 6
+a87 2
+                            <property name="title">
+                                <string></string>
+d89 2
+a90 2
+                            <property name="flat">
+                                <bool>false</bool>
+d92 2
+a93 2
+                            <property name="exclusive">
+                                <bool>true</bool>
+d95 33
+a127 69
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QToolButton">
+                                    <property name="name">
+                                        <cstring>toolButton2</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Icons</string>
+                                    </property>
+                                    <property name="toggleButton">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="buttonGroupId">
+                                        <number>0</number>
+                                    </property>
+                                </widget>
+                                <widget class="QToolButton">
+                                    <property name="name">
+                                        <cstring>toolButton1</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Text</string>
+                                    </property>
+                                    <property name="toggleButton">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="buttonGroupId">
+                                        <number>1</number>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                    </hbox>
+                </widget>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer1</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>60</width>
+                            <height>20</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QLineEdit">
+                    <property name="name">
+                        <cstring>leSearch</cstring>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QIconView">
+            <property name="name">
+                <cstring>mIcons</cstring>
+            </property>
+            <property name="acceptDrops">
+                <bool>false</bool>
+d129 2
+a130 2
+            <property name="hScrollBarMode">
+                <enum>AlwaysOff</enum>
+d132 2
+a133 2
+            <property name="selectionMode">
+                <enum>Extended</enum>
+d135 2
+a136 2
+            <property name="resizeMode">
+                <enum>Adjust</enum>
+d138 192
+a329 272
+        </widget>
+    </vbox>
+</widget>
+<menubar>
+    <property name="name">
+        <cstring>MenuBarEditor</cstring>
+    </property>
+    <property name="backgroundOrigin">
+        <enum>AncestorOrigin</enum>
+    </property>
+    <item text="&amp;File" name="File">
+        <action name="actionFileImport"/>
+        <action name="actionFileExport"/>
+        <action name="actionFileClose"/>
+        <separator/>
+        <action name="actionFileQuit"/>
+    </item>
+    <item text="&amp;Edit" name="Edit">
+        <action name="actionEditImportItem"/>
+        <action name="actionEditExportItem"/>
+        <separator/>
+        <action name="actionEditPreferences"/>
+    </item>
+    <item text="&amp;Help" name="Help">
+        <action name="actionHelpAbout"/>
+        <action name="actionHelpAboutQt"/>
+    </item>
+</menubar>
+<toolbars>
+</toolbars>
+<actions>
+    <action>
+        <property name="name">
+            <cstring>actionFileClose</cstring>
+        </property>
+        <property name="text">
+            <string>Close</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Close</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+W</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionFileQuit</cstring>
+        </property>
+        <property name="text">
+            <string>Quit</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Quit</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+Q</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionHelpAbout</cstring>
+        </property>
+        <property name="text">
+            <string>About iPodIcons</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;About iPodIcons</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionFileSaveAs</cstring>
+        </property>
+        <property name="text">
+            <string>Save As</string>
+        </property>
+        <property name="menuText">
+            <string>Save &amp;As</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+Shift+S</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionEditImportItem</cstring>
+        </property>
+        <property name="text">
+            <string>Import Icon</string>
+        </property>
+        <property name="menuText">
+            <string>Import Icon</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionEditExportItem</cstring>
+        </property>
+        <property name="text">
+            <string>Export Icon</string>
+        </property>
+        <property name="menuText">
+            <string>Export Icon</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionFileOpen</cstring>
+        </property>
+        <property name="text">
+            <string>Open</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Open</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionFileSave</cstring>
+        </property>
+        <property name="text">
+            <string>Save</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Save</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionEditPreferences</cstring>
+        </property>
+        <property name="text">
+            <string>Preferences</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Preferences</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+;</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionFileImport</cstring>
+        </property>
+        <property name="text">
+            <string>Import Firmware</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Import Firmware</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+O</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionFileExport</cstring>
+        </property>
+        <property name="text">
+            <string>Export Firmware</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Export Firmware</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+S</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>actionHelpAboutQt</cstring>
+        </property>
+        <property name="text">
+            <string>About Qt</string>
+        </property>
+        <property name="menuText">
+            <string>About &amp;Qt</string>
+        </property>
+    </action>
+</actions>
+<connections>
+    <connection>
+        <sender>actionFileClose</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFileClose()</slot>
+    </connection>
+    <connection>
+        <sender>actionFileExport</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFileExport()</slot>
+    </connection>
+    <connection>
+        <sender>actionFileImport</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFileImport()</slot>
+    </connection>
+    <connection>
+        <sender>actionFileOpen</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFileOpen()</slot>
+    </connection>
+    <connection>
+        <sender>actionFileQuit</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFileQuit()</slot>
+    </connection>
+    <connection>
+        <sender>actionHelpAbout</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotHelpAbout()</slot>
+    </connection>
+    <connection>
+        <sender>actionEditExportItem</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotEditExportItem()</slot>
+    </connection>
+    <connection>
+        <sender>actionEditImportItem</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotEditImportItem()</slot>
+    </connection>
+    <connection>
+        <sender>actionEditPreferences</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotEditPreferences()</slot>
+    </connection>
+    <connection>
+        <sender>mIcons</sender>
+        <signal>contextMenuRequested(QIconViewItem*,const QPoint&amp;)</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotIconMenu(QIconViewItem*,const QPoint&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>mIcons</sender>
+        <signal>currentChanged(QIconViewItem*)</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotNewCurrentItem(QIconViewItem*)</slot>
+    </connection>
+    <connection>
+        <sender>actionHelpAboutQt</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotHelpAboutQt()</slot>
+    </connection>
+    <connection>
+        <sender>leSearch</sender>
+        <signal>returnPressed()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotSearch()</slot>
+    </connection>
+    <connection>
+        <sender>firmwareCombo</sender>
+        <signal>clicked(int)</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFirmwareCombo(int)</slot>
+    </connection>
+</connections>
+<tabstops>
+d331 2
+a332 21
+</tabstops>
+<slots>
+    <slot>slotFileClose()</slot>
+    <slot>slotFirmwareCombo(int)</slot>
+    <slot>slotIconMenu(QIconViewItem*,const QPoint&amp;)</slot>
+    <slot>slotEditImportItem()</slot>
+    <slot>slotEditExportItem()</slot>
+    <slot>slotFileExport()</slot>
+    <slot>slotFileImport()</slot>
+    <slot>slotEditPreferences()</slot>
+    <slot>slotFileOpen()</slot>
+    <slot>slotFileQuit()</slot>
+    <slot>slotHelpAbout()</slot>
+    <slot>slotFileSave()</slot>
+    <slot>slotFileSaveAs()</slot>
+    <slot>slotNewCurrentItem(QIconViewItem*)</slot>
+    <slot>slotHelpAboutQt()</slot>
+    <slot>slotSearch()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="6"/>
+</UI>
+@
+
+
+1.6
+log
+@ipodicons 0.3.0
+@
+text
+@d43 1
+a43 1
+                <cstring>layout2</cstring>
+d49 1
+a49 1
+                <widget class="QComboBox">
+d51 1
+a51 1
+                        <cstring>firmwareCombo</cstring>
+d53 2
+a54 2
+                    <property name="focusPolicy">
+                        <enum>TabFocus</enum>
+d56 73
+d142 1
+a142 1
+                            <width>612</width>
+d147 5
+a410 6
+        <sender>firmwareCombo</sender>
+        <signal>activated(int)</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotFirmwareCombo(int)</slot>
+    </connection>
+    <connection>
+d428 12
+a442 1
+    <tabstop>firmwareCombo</tabstop>
+d460 1
+@
+
+
+1.5
+log
+@ipodicons 0.2.4
+@
+text
+@d5 1
+a5 1
+ * Copyright (C) 2004  Lincoln Ramsay
+d30 2
+a31 2
+            <width>693</width>
+            <height>520</height>
+d53 3
+d83 6
+d103 3
+a105 4
+        <action name="actionSelect"/>
+        <action name="actionClear"/>
+        <action name="actionSave"/>
+        <action name="actionSaveAs"/>
+d107 5
+a111 2
+        <action name="actionImportItem"/>
+        <action name="actionExportItem"/>
+d113 1
+a113 1
+        <action name="actionQuit"/>
+d116 2
+a117 1
+        <action name="actionAbout"/>
+d125 1
+a125 1
+            <cstring>actionSelect</cstring>
+d128 1
+a128 1
+            <string>Import Firmware...</string>
+d131 1
+a131 1
+            <string>&amp;Import Firmware...</string>
+d134 1
+a134 1
+            <string>Ctrl+O</string>
+d139 1
+a139 1
+            <cstring>actionClear</cstring>
+d142 1
+a142 1
+            <string>Clear Firmware...</string>
+d145 1
+a145 1
+            <string>&amp;Clear Firmware</string>
+d148 1
+a148 1
+            <string>Ctrl+W</string>
+d153 1
+a153 1
+            <cstring>actionSave</cstring>
+d156 1
+a156 1
+            <string>Overwrite Firmware...</string>
+d159 1
+a159 1
+            <string>&amp;Overwrite Firmware...</string>
+d162 1
+a162 1
+            <string>Ctrl+S</string>
+d167 1
+a167 1
+            <cstring>actionQuit</cstring>
+d170 1
+a170 1
+            <string>Quit</string>
+d173 1
+a173 1
+            <string>&amp;Quit</string>
+d176 23
+a198 1
+            <string>Ctrl+Q</string>
+d203 1
+a203 1
+            <cstring>actionAbout</cstring>
+d206 1
+a206 1
+            <string>About iPodIcons</string>
+d209 9
+a217 1
+            <string>&amp;About iPodIcons</string>
+d219 2
+a220 2
+        <property name="accel">
+            <string></string>
+d225 1
+a225 1
+            <cstring>actionSaveAs</cstring>
+d228 1
+a228 1
+            <string>Export Firmware...</string>
+d231 1
+a231 1
+            <string>&amp;Export Firmware...</string>
+d234 1
+a234 1
+            <string>Ctrl+Shift+S</string>
+d239 1
+a239 1
+            <cstring>actionImportItem</cstring>
+d242 1
+a242 1
+            <string>Import Icon</string>
+d245 1
+a245 1
+            <string>Import Icon</string>
+d248 1
+a248 1
+            <string>Ctrl+I</string>
+d253 1
+a253 1
+            <cstring>actionExportItem</cstring>
+d256 1
+a256 1
+            <string>Export Icon</string>
+d259 1
+a259 1
+            <string>Export Icon</string>
+d262 12
+a273 1
+            <string>Ctrl+E</string>
+d279 25
+a303 1
+        <sender>actionQuit</sender>
+d306 1
+a306 1
+        <slot>close()</slot>
+d309 1
+a309 1
+        <sender>actionSelect</sender>
+d312 1
+a312 1
+        <slot>slotSelectFirmware()</slot>
+d315 1
+a315 1
+        <sender>actionClear</sender>
+d318 1
+a318 1
+        <slot>slotClearFirmware()</slot>
+d321 1
+a321 1
+        <sender>actionSave</sender>
+d324 1
+a324 1
+        <slot>slotSaveFirmware()</slot>
+d327 1
+a327 1
+        <sender>actionAbout</sender>
+d330 1
+a330 1
+        <slot>slotAbout()</slot>
+d345 2
+a346 2
+        <sender>actionSaveAs</sender>
+        <signal>activated()</signal>
+d348 1
+a348 1
+        <slot>slotSaveNewFirmware()</slot>
+d351 1
+a351 1
+        <sender>actionExportItem</sender>
+d354 1
+a354 7
+        <slot>slotExportItem()</slot>
+    </connection>
+    <connection>
+        <sender>actionImportItem</sender>
+        <signal>activated()</signal>
+        <receiver>IconBrowserBase</receiver>
+        <slot>slotImportItem()</slot>
+d358 1
+a359 1
+    <tabstop>mIcons</tabstop>
+d362 1
+a362 4
+    <slot>slotSelectFirmware()</slot>
+    <slot>slotClearFirmware()</slot>
+    <slot>slotSaveFirmware()</slot>
+    <slot>slotAbout()</slot>
+d365 12
+a376 3
+    <slot>slotSaveNewFirmware()</slot>
+    <slot>slotImportItem()</slot>
+    <slot>slotExportItem()</slot>
+@
+
+
+1.4
+log
+@ipodicons 0.2.3
+@
+text
+@a49 15
+                    <item>
+                        <property name="text">
+                            <string>Icons</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>Fonts</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>Text</string>
+                        </property>
+                    </item>
+a52 3
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+d99 3
+d195 28
+d273 12
+d298 2
+@
+
+
+1.3
+log
+@ipodicons 0.2.0
+@
+text
+@d49 16
+a64 1
+                <widget class="QPushButton">
+d66 1
+a66 5
+                        <cstring>selectFirmware</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                        </font>
+d68 1
+a68 19
+                    <property name="text">
+                        <string>Import...</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>saveFirmware</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Export...</string>
+                    </property>
+                    <property name="autoDefault">
+d84 1
+a84 1
+                            <width>240</width>
+a88 11
+                <widget class="QComboBox">
+                    <property name="name">
+                        <cstring>firmwareCombo</cstring>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>200</width>
+                            <height>0</height>
+                        </size>
+                    </property>
+                </widget>
+d115 1
+d131 1
+a131 1
+            <string>&amp;Import</string>
+d134 1
+a134 1
+            <string>&amp;Import</string>
+d145 1
+a145 1
+            <string>&amp;Clear</string>
+d148 1
+a148 1
+            <string>&amp;Clear</string>
+d159 1
+a159 1
+            <string>&amp;Export</string>
+d162 1
+a162 1
+            <string>&amp;Export</string>
+d173 1
+a173 1
+            <string>&amp;Quit</string>
+d187 1
+a187 1
+            <string>&amp;About</string>
+d190 1
+a190 1
+            <string>&amp;About</string>
+d196 14
+a212 12
+        <sender>selectFirmware</sender>
+        <signal>clicked()</signal>
+        <receiver>actionSelect</receiver>
+        <slot>activate()</slot>
+    </connection>
+    <connection>
+        <sender>saveFirmware</sender>
+        <signal>clicked()</signal>
+        <receiver>actionSave</receiver>
+        <slot>activate()</slot>
+    </connection>
+    <connection>
+d254 6
+a261 2
+    <tabstop>selectFirmware</tabstop>
+    <tabstop>saveFirmware</tabstop>
+d272 1
+@
+
+
+1.2
+log
+@importing ipodicons 0.1.2
+@
+text
+@d30 2
+a31 2
+            <width>612</width>
+            <height>521</height>
+d43 1
+a43 1
+                <cstring>layout3</cstring>
+d58 1
+a58 16
+                        <string>Import Firmware...</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>clearFirmware</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Clear Firmware</string>
+d73 1
+a73 1
+                        <string>Export Firmware...</string>
+d91 1
+a91 1
+                            <width>100</width>
+d96 11
+d127 1
+a127 1
+        <enum>WidgetOrigin</enum>
+a133 1
+        <action name="actionClose"/>
+d167 3
+a212 14
+    <action>
+        <property name="name">
+            <cstring>actionClose</cstring>
+        </property>
+        <property name="text">
+            <string>&amp;Close</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Close</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+W</string>
+        </property>
+    </action>
+a221 6
+        <sender>clearFirmware</sender>
+        <signal>clicked()</signal>
+        <receiver>actionClear</receiver>
+        <slot>activate()</slot>
+    </connection>
+    <connection>
+d258 8
+a265 2
+        <sender>actionClose</sender>
+        <signal>activated()</signal>
+d267 1
+a267 1
+        <slot>close()</slot>
+d270 6
+d281 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d30 2
+a31 2
+            <width>600</width>
+            <height>480</height>
+d35 1
+a35 1
+        <string>iPod Icons</string>
+d43 1
+a43 1
+                <cstring>layout1</cstring>
+d58 31
+a88 1
+                        <string>Select Firmware...</string>
+d106 1
+a106 1
+                            <width>321</width>
+d117 3
+d126 104
+d234 24
+d261 24
+d288 3
+a291 1
+<pixmapinproject/>
+@
+
+
+1.1.1.1
+log
+@adding ipodicons
+@
+text
+@@

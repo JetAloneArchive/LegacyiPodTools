@@ -1,0 +1,443 @@
+head	1.11;
+access;
+symbols
+	ipodicons-0_3_6:1.11
+	ipodicons-0_3_5:1.11
+	ipodicons-0_3_4:1.11
+	qt4_port:1.10.0.2
+	ipodicons-0_3_3:1.8
+	ipodicons-0_3_2:1.8
+	ipodicons-0_3_1:1.8
+	ipodicons-0_3_0:1.7
+	ipodicons-0_2_4:1.6
+	ipodicons-0_2_3:1.5
+	ipodicons-0_2_2:1.4
+	ipodicons-0_2_1:1.4
+	ipodicons-0_2_0:1.3
+	ipodicons-0_1_3:1.2
+	ipodicons-0_1_2:1.2
+	ipodicons-0_1_1:1.1.1.1
+	release:1.1.1.1
+	vendor:1.1.1;
+locks; strict;
+comment	@ * @;
+
+
+1.11
+date	2005.09.14.02.35.46;	author a1291762;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2005.07.12.14.05.45;	author a1291762;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2005.07.08.14.19.05;	author a1291762;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2005.03.13.02.06.47;	author link;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2005.03.13.02.05.54;	author link;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2005.03.13.02.03.39;	author link;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2005.03.13.02.02.39;	author link;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2005.03.13.02.00.55;	author link;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.03.13.02.00.01;	author link;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.03.13.01.50.30;	author link;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.01.47.44;	author link;	state Exp;
+branches
+	1.1.1.1;
+next	;
+
+1.1.1.1
+date	2005.03.13.01.47.44;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.11
+log
+@Throw away the Qt 4 work (the qt4_port branch can be used to continue it).
+Trying to manually sync to pre-qt4 state (might not be there).
+Build with Qt 3.3.5.
+@
+text
+@/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+#ifndef ICONBROWSER_H
+#define ICONBROWSER_H
+
+#include "iconbrowserbase.h"
+
+#include <qstring.h>
+
+class IpodViewItem;
+class QProcess;
+class FirmwareSelector;
+#ifdef DATA_FILE
+class DataFile;
+#endif
+class PrefsDialog;
+
+class IconBrowser : public IconBrowserBase
+{
+    friend class IpodViewItem;
+    friend class PrefsDialog;
+
+    Q_OBJECT
+public:
+    IconBrowser( QWidget *parent = 0, const char *name = 0, WFlags f = 0 );
+    virtual ~IconBrowser();
+
+    enum ItemType { Icon = 0, Text = 1 };
+
+    void importItem( IpodViewItem *itm );
+    void exportItem( IpodViewItem *itm );
+
+private slots:
+    void slotFileOpen();
+    void slotFileClose();
+    void slotFileSave();
+    void slotFileSaveAs();
+    void slotFileImport();
+    void slotFileExport();
+    void slotFileQuit();
+    void slotEditImportItem();
+    void slotEditExportItem();
+    void slotEditPreferences();
+    void slotHelpAbout();
+    void slotHelpAboutQt();
+
+    void slotFirmwareCombo( int index );
+    void slotIconMenu( QIconViewItem *_itm, const QPoint &p );
+    void slotNewCurrentItem( QIconViewItem *item );
+    void slotSearch();
+
+    void slotImportItemDone();
+    void slotFileImportDone();
+    void slotExportDone();
+    void slotRestoreDone();
+
+private:
+    void refreshDisplay();
+    void saveFirmware( bool overwrite );
+    bool checkSave();
+    void updateText();
+    void saveSession();
+    void loadSession();
+    int extractDepth( const QString &file );
+
+    FirmwareSelector *firmwareSelector;
+    QString importFile;
+    QString prevSearch;
+    QValueList<IpodViewItem*> mLoadedIcons;
+    bool mHiddenIcons;
+
+    struct Session
+    {
+	enum StartingDirType { Open = 0, Save, LoadPng, SavePng, MaxStartingDirType };
+	QString startingDir[MaxStartingDirType];
+#ifdef DATA_FILE
+	DataFile *currentFile;
+#else
+	QString currentFile;
+#endif
+	QStringList recentFiles;
+	int resourceIndex;
+	int thumbSize;
+	bool thumbnails;
+	QString outFormat;
+    };
+    Session session;
+};
+
+#endif
+@
+
+
+1.10
+log
+@use the Ui classes directly instead of via intermediate classes
+@
+text
+@d21 1
+a21 1
+#include <ui_iconbrowserbase.h>
+d26 1
+a26 1
+class Q3Process;
+d33 1
+a33 1
+class IconBrowser : public Q3MainWindow, public Ui_IconBrowserBase
+d40 1
+a40 1
+    IconBrowser( QWidget *parent = 0, const char *name = 0, Qt::WFlags f = 0 );
+d63 2
+a64 2
+    void slotIconMenu( Q3IconViewItem *_itm, const QPoint &p );
+    void slotNewCurrentItem( Q3IconViewItem *item );
+d84 1
+a84 1
+    QList<IpodViewItem*> mLoadedIcons;
+@
+
+
+1.9
+log
+@Quick Qt 4 port.
+This just gets everything to compile.
+I need to steal my "how to process Qt 4 libs" code to make the .app usable.
+@
+text
+@d33 1
+a33 8
+class IconBrowserBase : public Q3MainWindow, public Ui_IconBrowserBase
+{
+public:
+    IconBrowserBase( QWidget *parent = 0, const char *name = 0, Qt::WFlags f = 0 );
+    ~IconBrowserBase();
+};
+
+class IconBrowser : public IconBrowserBase
+@
+
+
+1.8
+log
+@ipodicons 0.3.1
+@
+text
+@d21 1
+a21 1
+#include "iconbrowserbase.h"
+d26 1
+a26 1
+class QProcess;
+d33 7
+d47 1
+a47 1
+    IconBrowser( QWidget *parent = 0, const char *name = 0, WFlags f = 0 );
+d70 2
+a71 2
+    void slotIconMenu( QIconViewItem *_itm, const QPoint &p );
+    void slotNewCurrentItem( QIconViewItem *item );
+d91 1
+a91 1
+    QValueList<IpodViewItem*> mLoadedIcons;
+@
+
+
+1.7
+log
+@ipodicons 0.3.0
+@
+text
+@d65 1
+d83 3
+d100 1
+@
+
+
+1.6
+log
+@ipodicons 0.2.4
+@
+text
+@a21 1
+#include "settings.h"
+a24 1
+class QProgressDialog;
+d27 5
+d35 3
+d43 1
+a43 2
+    enum Dialog { OpenFirmware, SaveFirmware, LoadPng, SavePng, Import, Export };
+    enum ItemType { Icon, Text };
+d49 13
+a61 5
+    void slotSelectFirmware();
+    void slotClearFirmware();
+    void slotSaveFirmware();
+    void slotSaveNewFirmware();
+    void slotAbout();
+d64 1
+a64 5
+    void slotExportItem();
+    void slotImportItem();
+
+    void slotLoadFirmware( const QString &file );
+    void slotSaveFirmware( const QString &file );
+d66 4
+a69 6
+    void slotIpodeditData();
+    void slotIpodeditDone();
+
+    void slotImportCanceled();
+
+    void slotNewCurrentItem( QIconViewItem *item );
+d72 1
+a72 3
+    void refreshDisplay( bool clear );
+    QString getStartingDir( Dialog type );
+    void setStartingDir( Dialog type, const QString &file );
+d74 23
+a96 3
+    void removeDir( const QString &dir );
+
+    QProgressDialog *mProgressDialog;
+a97 1
+    QProcess *ipodeditProc;
+@
+
+
+1.5
+log
+@ipodicons 0.2.3
+@
+text
+@d2 1
+a2 1
+ * Copyright (C) 2004  Lincoln Ramsay
+d37 5
+a41 1
+    enum Dialog { OpenFirmware, SaveFirmware, LoadPng, SavePng };
+d51 2
+d62 1
+a62 3
+public:
+    void loadPng( IpodViewItem *itm );
+    void savePng( IpodViewItem *itm );
+d65 1
+a65 1
+    void refreshDisplay();
+d69 1
+@
+
+
+1.4
+log
+@ipodicons 0.2.1
+@
+text
+@a24 1
+#include <qmap.h>
+d27 1
+a27 1
+class IpodItem;
+d43 1
+d57 2
+a58 2
+    void loadPng( IpodItem *itm );
+    void savePng( IpodItem *itm );
+d64 1
+@
+
+
+1.3
+log
+@ipodicons 0.2.0
+@
+text
+@a26 1
+class QProcess;
+d29 1
+a64 1
+    QProcess *ipodeditProc;
+d67 1
+@
+
+
+1.2
+log
+@importing ipodicons 0.1.2
+@
+text
+@d22 1
+d25 1
+d29 1
+d38 2
+d45 5
+d56 4
+d62 2
+a63 2
+    QString getStartingDir();
+    void setStartingDir( const QString &file );
+d67 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d26 1
+d33 1
+a33 1
+    ~IconBrowser();
+d37 5
+d44 2
+d48 2
+a50 1
+    QString pathPrefix;
+d52 1
+a52 1
+    QString dataDir;
+@
+
+
+1.1.1.1
+log
+@adding ipodicons
+@
+text
+@@

@@ -1,0 +1,169 @@
+head	1.5;
+access;
+symbols
+	ipodicons-0_2_4:1.4
+	ipodicons-0_2_3:1.3
+	ipodicons-0_2_2:1.2
+	ipodicons-0_2_1:1.2
+	ipodicons-0_2_0:1.2
+	ipodicons-0_1_3:1.1
+	ipodicons-0_1_2:1.1;
+locks; strict;
+comment	@ * @;
+
+
+1.5
+date	2005.03.13.02.05.54;	author link;	state dead;
+branches;
+next	1.4;
+
+1.4
+date	2005.03.13.02.03.39;	author link;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.03.13.02.02.39;	author link;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.03.13.02.00.01;	author link;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.01.50.30;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.5
+log
+@ipodicons 0.3.0
+@
+text
+@/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+#ifndef SETTINGS_H
+#define SETTINGS_H
+
+#include <qsettings.h>
+#include <qmap.h>
+#include <qstring.h>
+
+
+class Session
+{
+public:
+    QString filename;
+    QStringList glob;
+    int globIndex;
+    int resourceIndex;
+};
+
+
+class Settings : public QSettings
+{
+public:
+    Settings();
+    virtual ~Settings();
+
+    static void initialize();
+
+    static QString pathPrefix();
+    static QString dataDir();
+
+    static void saveSession( const Session &session );
+    static void loadSession( Session &session );
+
+private:
+    static bool initialized;
+    static QString mPathPrefix;
+    static QString mDataDir;
+};
+
+#endif
+@
+
+
+1.4
+log
+@ipodicons 0.2.4
+@
+text
+@@
+
+
+1.3
+log
+@ipodicons 0.2.3
+@
+text
+@d2 1
+a2 1
+ * Copyright (C) 2004  Lincoln Ramsay
+a24 15
+class IpodItem
+{
+public:
+    // IMPORTANT! these must match the values in firmwareCombo and gPicsDirs
+    enum ItemType { Icon = 0, Font = 1, Text = 2 };
+
+    ItemType type;
+    QString address;
+    QString filename;
+    int bitDepth;
+    int height;
+    int width;
+    QString message;
+};
+
+a32 1
+    QMap<QString,IpodItem*> items;
+@
+
+
+1.2
+log
+@ipodicons 0.2.0
+@
+text
+@d22 18
+d44 1
+a44 1
+    QString file;
+d47 2
+@
+
+
+1.1
+log
+@importing ipodicons 0.1.2
+@
+text
+@d23 9
+d43 3
+a50 1
+
+@
+

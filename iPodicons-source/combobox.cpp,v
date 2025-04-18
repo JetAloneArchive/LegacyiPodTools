@@ -1,0 +1,141 @@
+head	1.4;
+access;
+symbols
+	ipodicons-0_3_6:1.4
+	ipodicons-0_3_5:1.4
+	ipodicons-0_3_4:1.4
+	qt4_port:1.2.0.2
+	ipodicons-0_3_3:1.1
+	ipodicons-0_3_2:1.1
+	ipodicons-0_3_1:1.1;
+locks; strict;
+comment	@// @;
+
+
+1.4
+date	2005.09.14.03.15.42;	author a1291762;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.09.14.02.35.46;	author a1291762;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.07.10.04.56.19;	author a1291762;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.03.13.02.06.47;	author link;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.4
+log
+@this include is reqired sometimes
+@
+text
+@/*
+ * Copyright (C) 2004-2005  Lincoln Ramsay
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+#include "combobox.h"
+#include "trace.h"
+
+#include <qevent.h>
+
+ComboBox::ComboBox( QWidget *parent, const char *name )
+    : QComboBox( parent, name )
+{
+    TRACE("ComboBox::ComboBox()");
+    init();
+}
+
+ComboBox::ComboBox( bool rw, QWidget *parent, const char *name )
+    : QComboBox( rw, parent, name )
+{
+    TRACE("ComboBox::ComboBox()");
+    init();
+}
+
+ComboBox::~ComboBox()
+{
+    TRACE("ComboBox::~ComboBox()");
+}
+
+void ComboBox::init()
+{
+    mBusy = false;
+}
+
+bool ComboBox::isBusy()
+{
+    return mBusy;
+}
+
+void ComboBox::popup()
+{
+    mBusy = true;
+    QComboBox::popup();
+}
+
+bool ComboBox::eventFilter( QObject *object, QEvent *event )
+{
+    if ( event && event->type() == QEvent::Hide )
+	mBusy = false;
+    return QComboBox::eventFilter( object, event );
+}
+
+@
+
+
+1.3
+log
+@Throw away the Qt 4 work (the qt4_port branch can be used to continue it).
+Trying to manually sync to pre-qt4 state (might not be there).
+Build with Qt 3.3.5.
+@
+text
+@d21 2
+@
+
+
+1.2
+log
+@make installl builds a runnnable app
+@
+text
+@a20 2
+#include <qevent.h>
+
+@
+
+
+1.1
+log
+@ipodicons 0.3.1
+@
+text
+@d21 2
+@
+
